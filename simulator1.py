@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 stored_binary_data = b''
 
-@app.route('/post_json', methods=['POST'])
+@app.route('/post_json', methods=['POST','GET'])
 def post_json():
     global stored_binary_data  
     if request.data:
