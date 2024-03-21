@@ -10,7 +10,7 @@ def post_json():
     global stored_binary_data  
     if request.data:
         stored_binary_data = request.data
-         base64_data = base64.b64encode(stored_binary_data).decode('utf-8')
+        base64_data = base64.b64encode(stored_binary_data).decode('utf-8')
         return jsonify({'binary_data': base64_data}), 200
     else:
         error_message = "An error occurred"
