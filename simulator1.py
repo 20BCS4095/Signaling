@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template
+import base64
 
 app = Flask(__name__)
 
@@ -23,7 +24,9 @@ def post_json():
 def get_json():
     global stored_binary_data
     if stored_binary_data:
-        return render_template('index.html', data=stored_binary_data)
+        decoded_data = base64.b64decode(stored_binary_data).decode('utf-8')
+        data_size = len(decoded_data)
+        return render_template('index.html', data=decoded_data, data_size=data_size)
     else:
         return 'No binary data stored', 404
 
