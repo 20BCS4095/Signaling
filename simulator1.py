@@ -6,8 +6,8 @@ json_data_with_headers = {}
 
 @app.route('/post_json', methods=['POST'])
 def post_json():
-    if not request.is_json:
-        return jsonify({'error': 'Request must contain JSON data'}), 400
+    #if not request.is_json:
+    #   return jsonify({'error': 'Request must contain JSON data'}), 400
     json_data = request.get_json()
     headers = dict(request.headers)
     global json_data_with_headers
