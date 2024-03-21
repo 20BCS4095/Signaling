@@ -9,7 +9,7 @@ def post_json():
     global stored_binary_data  
     if request.data:
         stored_binary_data = request.data
-        return jsonify({'binary_data': binary_data.decode('utf-8')}), 200
+        return jsonify({'binary_data': stored_binary_data.decode('utf-8')}), 200
     else:
         error_message = "An error occurred"
         return jsonify({'error': error_message}), 400
