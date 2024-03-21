@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template,jsonify
+import base64
 
 app = Flask(__name__)
 
@@ -9,7 +10,8 @@ def post_json():
     global stored_binary_data  
     if request.data:
         stored_binary_data = request.data
-        return jsonify({'binary_data': stored_binary_data.decode('utf-8')}), 200
+         base64_data = base64.b64encode(stored_binary_data).decode('utf-8')
+        return jsonify({'binary_data': base64_data}), 200
     else:
         error_message = "An error occurred"
         return jsonify({'error': error_message}), 400
