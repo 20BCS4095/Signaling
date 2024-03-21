@@ -14,7 +14,10 @@ def post_json():
         else:
             return 'No data is received', 400
     elif request.method == 'GET':
-        return 'Get method is success', 200
+        if stored_binary_data:
+            return 'Get method is success', 200
+        else:
+            return 'No information available',400
 
 @app.route('/view', methods=['GET'])
 def get_json():
