@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template,jsonify
 
 app = Flask(__name__)
 
@@ -9,9 +9,10 @@ def post_json():
     global stored_binary_data  
     if request.data:
         stored_binary_data = request.data
-        return 'Binary data uploaded successfully', 200
+        return jsonify({'binary_data': binary_data.decode('utf-8')}), 200
     else:
-        return 'No binary data received', 400
+        error_message = "An error occurred"
+        return jsonify({'error': error_message}), 400
 
 @app.route('/view', methods=['GET'])
 def get_json():
