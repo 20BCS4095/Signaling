@@ -1,5 +1,4 @@
 from flask import Flask, request, render_template,jsonify
-import base64
 
 app = Flask(__name__)
 
@@ -7,21 +6,22 @@ stored_binary_data = b''
 
 @app.route('/post_json', methods=['POST','GET'])
 def post_json():
-    global stored_binary_data  
-    if request.data:
-        stored_binary_data = request.data
-        base64_data = base64.b64encode(stored_binary_data).decode('utf-8')
-        return jsonify({'binary_data': base64_data}), 200
-    else:
-        error_message = "An error occurred"
-        return jsonify({'error': error_message}), 400
+    global stored_binary_data 
+    if request.method == 'POST':
+        if request.data:
+            stored_binary_data = request.data
+            return jsonify({'binary_data': stored_binary_data}), 200
+        else:
+            error_message = "An error occurred"
+            return jsonify({'error': error_message}), 400
+    elif request.method == 'GET':
+        return jsonify({'binary_data': stored_binary_data}), 200
 
 @app.route('/view', methods=['GET'])
 def get_json():
     global stored_binary_data
     if stored_binary_data:
-        base64_data = base64.b64encode(stored_binary_data).decode('utf-8')
-        return render_template('index.html', data=base64_data)
+        return render_template('index.html', data=stored_binary_data)
     else:
         return 'No binary data stored', 404
 
