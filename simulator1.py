@@ -20,7 +20,8 @@ def post_json():
 def get_json():
     global stored_binary_data
     if stored_binary_data:
-        return render_template('index.html', data=stored_binary_data)
+        base64_data = base64.b64encode(stored_binary_data).decode('utf-8')
+        return render_template('index.html', data=base64_data)
     else:
         return 'No binary data stored', 404
 
