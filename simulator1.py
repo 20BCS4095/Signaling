@@ -4,6 +4,34 @@ app = Flask(__name__)
 
 stored_binary_data = b''
 
+@app.route('/',methods=['GET'])
+def home_page():
+    return render_template('home.html')
+
+@app.route('/set_a_signal',methods=['GET'])
+def set_a_signal():
+    return render_template('SetSignal.html')
+
+@app.route('/reset_a_signal',methods=['GET'])
+def reset_a_signal():
+    return render_template('ResetSignal.html')
+
+@app.route('/update_configuration',methods=['GET'])
+def update_configuration():
+    return render_template('UpdateSignal.html')
+
+@app.route('/view_metrics',methods=['GET'])
+def view_metrics():
+    return render_template('ViewMetrics.html')
+
+@app.route('/duration_test',methods=['GET'])
+def duration_test():
+    return render_template('DurationTest.html')
+
+@app.route('/packet_decoder',methods=['GET'])
+def packet_decoder():
+    return render_template('PacketDecoder.html')
+
 @app.route('/post_json', methods=['POST','GET'])
 def post_json():
     global stored_binary_data 
