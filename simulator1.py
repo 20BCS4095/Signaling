@@ -24,24 +24,24 @@ def conversion():
     while i < len(decimal_values):
         if decimal_values[i] == 9 and not version_found:
             version = decimal_values[i+1]
-            data["9"]=version
+            data["version"]=version
             i=i+1
             version_found = True
         elif decimal_values[i] == 25 and not command_found:
             command = decimal_values[i+1]
-            data["25"]=command
+            data["command"]=command
             i=i+1
             command_found = True
         elif decimal_values[i] == 20 and not collection_id_found:
             ascii_list = [decimal_values[i+1], decimal_values[i+2], decimal_values[i+3], decimal_values[i+4]]
             collection_id = ''.join(chr(code) for code in ascii_list)
-            data["20"]=collection_id
+            data["collection_id"]=collection_id
             i=i+4
             collection_id_found = True
         elif decimal_values[i] == 156 and not nonce_found:
             int_array = [decimal_values[i+1], decimal_values[i+2], decimal_values[i+3], decimal_values[i+4]]
             nonce = ' '.join(map(str, int_array))
-            data["156"]=nonce
+            data["nonce"]=nonce
             i=i+4
             nonce_found = True
         elif decimal_values[i] == 68 and not timestamp_found:
@@ -50,12 +50,12 @@ def conversion():
             time = int(hex_timestamp, 16)
             datetime_obj = datetime.datetime.fromtimestamp(time)
             timestamp = datetime_obj.strftime('%Y-%m-%d %H:%M:%S')
-            data["68"]=timestamp
+            data["timestamp"]=timestamp
             i=i+4
             timestamp_found = True
         elif decimal_values[i] == 134 and not encrypted_block_found:
             encrypted_block = decimal_values[i+1]
-            data["134"]=encrypted_block
+            data["encrypted_block"]=encrypted_block
             i=i+1
             encrypted_block_found = True
         else:
@@ -114,7 +114,7 @@ def get_json():
         decimal_string = ' '.join(map(str, decimal_values))
         data_size = len(decimal_string)
         data=conversion()
-        return render_template('index.html', data=decimal_string, binary_data=stored_binary_data, data_size=data_size, data1=data)
+        return render_template('index.html', data=decimal_string, binary_data=stored_binary_data,data_size=data_size,data1=data)
     else:
         return 'No binary data stored', 404
 
