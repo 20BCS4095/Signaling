@@ -53,8 +53,8 @@ def get_json():
     if stored_binary_data:
         decimal_values = [char for char in stored_binary_data]
         decimal_string = ' '.join(map(str, decimal_values))
-        data_size = len(decimal_string)
-        return render_template('index.html', data=decimal_string, data_size=data_size)
+        data_size = len(stored_binary_data)
+        return render_template('index.html', data=decimal_string, binary_data=stored_binary_data, data_size=data_size)
     else:
         return 'No binary data stored', 404
 
