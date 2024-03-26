@@ -1,1 +1,184 @@
-<h1>Update</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Signaling Config</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; 
+        }
+        h1 {
+            background-color: rgba(0, 123, 255, 0.7); 
+            color: #fff; 
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s; 
+            margin-bottom: 20px; 
+        }
+        h1:hover {
+            background-color: #0056b3; 
+            color: #fff; 
+        }
+        h2{
+            color:#007bff;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff; 
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #007bff; 
+        }
+        .container:hover {
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); 
+            border-color: #0056b3; 
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #007bff; 
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da; 
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff; 
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff; 
+            color: #fff; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Signaling Configuration</h1>
+    <div class="container">
+        <form action="/update_config_data" method="post">
+            <h2>Enter Signaling Configuration</h2>
+            <br/>
+            <label for="collection_id">Collection ID:</label>
+            <input type="text" id="collection_id" name="collection_id" required>
+
+            <label for="descriptor">Descriptor:</label>
+            <input type="text" id="descriptor" name="descriptor" required>
+
+            <label for="protocol_switching_policy">Protocol Switching Policy:</label>
+            <input type="text" id="protocol_switching_policy" name="protocol_switching_policy" required>
+
+            <label for="polling_delay">Polling Delay:</label>
+            <input type="text" id="polling_delay" name="polling_delay" required min="1" step="1">
+
+            <label for="polling_timeout">Polling Timeout:</label>
+            <input type="text" id="polling_timeout" name="polling_timeout" required min="1" step="1">
+
+            <label for="retry_grace_count">Retry Grace Count:</label>
+            <input type="text" id="retry_grace_count" name="retry_grace_count" required min="1" >
+
+            <label for="random_window">Random Window:</label>
+            <input type="text" id="random_window" name="random_window" required min="1">
+
+            <label for="printer_status_ratio">Printer Status Ratio:</label>
+            <input type="text" id="printer_status_ratio" name="printer_status_ratio" required min="1">
+
+            <label for="max_gets_between_posts">Max Gets Between Posts:</label>
+            <input type="text" id="max_gets_between_posts" name="max_gets_between_posts" required min="1">
+
+            <label for="url">URL:</label>
+            <input type="text" id="url" name="url" required pattern="https?://.+">
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+<script>
+    document.getElementById("protocol_switching_policy").addEventListener("input", function(event) {
+        var inputValue = event.target.value.trim();
+        var validValues = ['httpOnly', 'udpOnly', 'httpProbeUdp'];
+        if (!validValues.includes(inputValue)) {
+            event.target.setCustomValidity("Protocol switching policy must be 'httpOnly', 'udpOnly', or 'httpProbeUdp'.");
+        } else {
+            event.target.setCustomValidity("");
+        }
+    });
+    document.getElementById("polling_delay").addEventListener("input", function(event) {
+        var inputValue = event.target.value;
+        var numericValue = parseInt(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            event.target.setCustomValidity("Polling delay must be a greater  than zero.");
+        } else {
+            event.target.setCustomValidity("");
+        }
+    });
+    document.getElementById("polling_timeout").addEventListener("input", function(event) {
+        var inputValue = event.target.value;
+        var numericValue = parseInt(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            event.target.setCustomValidity("Polling Timeout must be a greater  than zero.");
+        } else {
+            event.target.setCustomValidity("");
+        }
+    });
+    document.getElementById("retry_grace_count").addEventListener("input", function(event) {
+        var inputValue = event.target.value;
+        var numericValue = parseInt(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            event.target.setCustomValidity("Retry Grace count must be a greater  than zero.");
+        } else {
+            event.target.setCustomValidity("");
+        }
+    });
+    document.getElementById("random_window").addEventListener("input", function(event) {
+        var inputValue = event.target.value;
+        var numericValue = parseInt(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            event.target.setCustomValidity("Random Window must be a greater  than zero.");
+        } else {
+            event.target.setCustomValidity("");
+        }
+    });
+    document.getElementById("printer_status_ratio").addEventListener("input", function(event) {
+        var inputValue = event.target.value;
+        var numericValue = parseInt(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            event.target.setCustomValidity("Printer Status ratio must be a greater  than zero.");
+        } else {
+            event.target.setCustomValidity("");
+        }
+    });
+    document.getElementById("max_gets_between_posts").addEventListener("input", function(event) {
+        var inputValue = event.target.value;
+        var numericValue = parseInt(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            event.target.setCustomValidity("Max gets between posts must be a greater  than zero.");
+        } else {
+            event.target.setCustomValidity("");
+        }
+    });
+</script>
+</html>
