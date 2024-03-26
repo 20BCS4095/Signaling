@@ -24,6 +24,10 @@ def conversion():
     while i < len(decimal_values):
         if decimal_values[i] == 9 and not version_found:
             version = decimal_values[i+1]
+            binary_string = bin(version)
+            binary_number = int(binary_string, 2)
+            shifted_binary = binary_number >> 5
+            version=shifted_binary
             data["version"]=version
             i=i+1
             version_found = True
@@ -114,7 +118,7 @@ def get_json():
         decimal_string = ' '.join(map(str, decimal_values))
         data_size = len(decimal_string)
         data=conversion()
-        return render_template('index.html', data=decimal_string, binary_data=stored_binary_data,data_size=data_size,data1=data)
+        return render_template('index.html', data=decimal_string, binary_data=stored_binary_data, data1=data)
     else:
         return 'No binary data stored', 404
 
