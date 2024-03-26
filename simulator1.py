@@ -137,7 +137,7 @@ def post_json():
             return 'No data is received', 400
     elif request.method == 'GET':
         if stored_binary_data:
-            return 'Success', 200
+            return stored_binary_data, 200
         else:
             return 'No information available',400
 
