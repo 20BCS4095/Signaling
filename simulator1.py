@@ -3,7 +3,9 @@ import datetime
 
 app = Flask(__name__)
 
+stored_data = {}
 stored_binary_data = b''
+
 def conversion():
     data={}
     decimal_values = list(stored_binary_data)
@@ -95,8 +97,37 @@ def duration_test():
 def packet_decoder():
     return render_template('PacketDecoder.html')
 
+@app.route('/update_config_data', methods=['POST'])
+def update_config_data():
+    global stored_data
+    if request.method == 'POST':
+        collection_id = request.form.get('collection_id')
+        descriptor = request.form.get('descriptor')
+        protocol_switching_policy = request.form.get('protocol_switching_policy')
+        polling_delay = request.form.get('polling_delay')
+        polling_timeout = request.form.get('polling_timeout')
+        retry_grace_count = request.form.get('retry_grace_count')
+        random_window = request.form.get('random_window')
+        printer_status_ratio = request.form.get('printer_status_ratio')
+        max_gets_between_posts = request.form.get('max_gets_between_posts')
+        url = request.form.get('url')
+        stored_data = {
+            'Collection ID': collection_id,
+            'Descriptor': descriptor,
+            'Protocol Switching Policy': protocol_switching_policy,
+            'Polling Delay': polling_delay,
+            'Polling Timeout': polling_timeout,
+            'Retry Grace Count': retry_grace_count,
+            'Random Window': random_window,
+            'Printer Status Ratio': printer_status_ratio,
+            'Max Gets Between Posts': max_gets_between_posts,
+            'URL': url
+        }
+
+        return stored_data,200
+    
 @app.route('/post_json', methods=['POST','GET'])
-def post_data():
+def post_json():
     global stored_binary_data 
     if request.method == 'POST':
         if request.data:
@@ -106,7 +137,7 @@ def post_data():
             return 'No data is received', 400
     elif request.method == 'GET':
         if stored_binary_data:
-            return 'Get method is success', 200
+            return stored_binary_data, 200
         else:
             return 'No information available',400
 
@@ -116,7 +147,6 @@ def get_json():
     if stored_binary_data:
         decimal_values = [char for char in stored_binary_data]
         decimal_string = ' '.join(map(str, decimal_values))
-        data_size = len(decimal_string)
         data=conversion()
         return render_template('index.html', data=decimal_string, binary_data=stored_binary_data, data1=data)
     else:
