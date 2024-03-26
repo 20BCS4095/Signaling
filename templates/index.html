@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
+    <title>POST Data</title>
 </head>
 <body>
     <h2>Raw Data</h2>
     <pre>{{binary_data}}</pre>
-    <h2>POST Data Size:</h2>
-    <pre>{{ data_size }}</pre>
-    <h2>POST Data after Conversion:</h2>
+    <h2>Data after Conversion:</h2>
     <pre>{{ data }}</pre>
     <h2>Version : </h2>
     <pre>{{data1.version}}</pre>
@@ -22,9 +20,9 @@
     <pre>{{data1.nonce}}</pre>
     <h2>Time Stamp : </h2>
     <pre>{{data1.timestamp}}</pre>
-    <h2>Encrypted : </h2>
+    <h2>Encrypted Block : </h2>
     <pre>{{data1.encrypted_block}}</pre>
-    <h2>Encrypted Value : </h2>
+    <h2>Authenticated And Encrypted : </h2>
     <pre>{{data1.other}}</pre>
 </body>
 </html>
