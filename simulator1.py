@@ -43,17 +43,25 @@ def conversion():
             i = i+1
             command_found = True
         elif decimal_values[i] == 20 and not collection_id_found:
-            ascii_list = [decimal_values[i+1], decimal_values[i+2], decimal_values[i+3], decimal_values[i+4]]
+            ascii_list=[]
+            i=i+1
+            while(i>4 and i<20 and decimal_values[i]!= 156):
+                ascii_list.append(decimal_values[i])
+                i=i+1
             collection_id = ''.join(chr(code) for code in ascii_list)
             data["collection_id"] = collection_id
-            i = i+4
             collection_id_found = True
+            i=i-1
         elif decimal_values[i] == 156 and not nonce_found:
-            int_array = [decimal_values[i+1], decimal_values[i+2], decimal_values[i+3], decimal_values[i+4]]
-            nonce = ' '.join(map(str, int_array))
+            ascii_list=[]
+            i=i+1
+            while(i>21 and i<53 and decimal_values[i]!=68):
+                ascii_list.append(decimal_values[i])
+                i=i+1
+            nonce = ' '.join(map(str, ascii_list))
             data["nonce"] = nonce
-            i = i+4
             nonce_found = True
+            i=i-1
         elif decimal_values[i] == 68 and not timestamp_found:
             int_array = [decimal_values[i+1], decimal_values[i+2], decimal_values[i+3], decimal_values[i+4]]
             hex_timestamp = ''.join(map(str, int_array))
