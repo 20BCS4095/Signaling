@@ -1,1 +1,138 @@
-<h1>Set</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Configuration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; 
+        }
+        h1 {
+            background-color: rgba(0, 123, 255, 0.7); 
+            color: #fff; 
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s; 
+            margin-bottom: 20px; 
+        }
+        h1:hover {
+            background-color: #0056b3; 
+            color: #fff; 
+        }
+        h2{
+            color:#007bff;
+            text-align: center;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff; 
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #007bff; 
+        }
+        .container:hover {
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); 
+            border-color: #0056b3; 
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #007bff; 
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da; 
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff; 
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff; 
+            color: #fff; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Set Signaling</h1>
+    <div class="container">
+        <form id="update_config_form" action="/set_signaling_data" method="post">
+            <h2>Set Application Flag</h2>
+            <br/>
+            <label for="update_configuration">Update Configuration:</label>
+            <input type="text" id="update_configuration" name="update_configuration" required>
+
+            <label for="start_tunnel_1">Start Tunnel 1:</label>
+            <input type="text" id="start_tunnel_1" name="start_tunnel_1" required>
+
+            <label for="start_tunnel_2">Start Tunnel 2:</label>
+            <input type="text" id="start_tunnel_2" name="start_tunnel_2" required>
+
+            <label for="start_tunnel_3">Start Tunnel 3:</label>
+            <input type="text" id="start_tunnel_3" name="start_tunnel_3" required>
+
+            <label for="start_tunnel_4">Start Tunnel 4:</label>
+            <input type="text" id="start_tunnel_4" name="start_tunnel_4" required>
+
+            <label for="metrics_push">Metrics Push:</label>
+            <input type="text" id="metrics_push" name="metrics_push" required>
+
+            <label for="device_configuration">Device Configuration:</label>
+            <input type="text" id="device_configuration" name="device_configuration" required>
+
+            <label for="echo">Echo:</label>
+            <input type="text" id="echo" name="echo" required>
+
+            <label for="rtp_kick">RTP Kick:</label>
+            <input type="text" id="rtp_kick" name="rtp_kick" required>
+
+            <label for="fw_update">FW Update:</label>
+            <input type="text" id="fw_update" name="fw_update" required>
+
+            <label for="registration_subscription">Registration Subscription:</label>
+            <input type="text" id="registration_subscription" name="registration_subscription" required>
+
+            <label for="cdm_pubsub_1">CDM PubSub 1:</label>
+            <input type="text" id="cdm_pubsub_1" name="cdm_pubsub_1" required>
+
+            <label for="cdm_pubsub_2">CDM PubSub 2:</label>
+            <input type="text" id="cdm_pubsub_2" name="cdm_pubsub_2" required>
+
+            <label for="cdm_pubsub_3">CDM PubSub 3:</label>
+            <input type="text" id="cdm_pubsub_3" name="cdm_pubsub_3" required>
+
+            <label for="cdm_pubsub_4">CDM PubSub 4:</label>
+            <input type="text" id="cdm_pubsub_4" name="cdm_pubsub_4" required>
+
+            <label for="cdm_ondemand_desires">CDM OnDemand Desires:</label>
+            <input type="text" id="cdm_ondemand_desires" name="cdm_ondemand_desires" required>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
