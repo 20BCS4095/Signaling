@@ -42,7 +42,7 @@ def conversion():
             data["command"] = command
             i = i+1
             command_found = True
-        elif decimal_values[i] == 20 and not collection_id_found:
+        elif decimal_values[i] == 22 or decimal_values[i] == 20 and not collection_id_found:
             ascii_list=[]
             i=i+1
             while(i>4 and i<20 and decimal_values[i]!= 156):
@@ -55,7 +55,7 @@ def conversion():
         elif decimal_values[i] == 156 and not nonce_found:
             ascii_list=[]
             i=i+1
-            while(i>21 and i<53 and decimal_values[i]!=68):
+            while(i>12 and i<48 and decimal_values[i]!=68):
                 ascii_list.append(decimal_values[i])
                 i=i+1
             nonce = ' '.join(map(str, ascii_list))
