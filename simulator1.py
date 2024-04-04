@@ -1,8 +1,12 @@
-from flask import Flask, redirect, request, render_template, url_for
+import json
+from flask import Flask, jsonify, redirect, request, render_template, url_for
 import datetime
-
+from datetime import datetime
+from enum import IntEnum
 app = Flask(__name__)
 
+sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
+download_data = []
 update_config_data = {}
 set_signaling_data = {}
 reset_signaling_data = {}
@@ -10,77 +14,158 @@ stored_binary_data = b''
 success_frame = b''
 error_frame = b''
 critical_error_frame = b''
+HEADER_MASK = 0xF8
+HEADER_LEN_MASK = 0x07
+TLV_BIG = 0x06
+TLV_EXTRA_BYTE = 0x07
+TLV_BIG_LEN_IN_BITS = 0xFE
+TLV_EXTRA_BYTE_LEN_IN_BYTES = 0xFD
+index = 0
+collection=0
+Values={
+'Version':'',
+'Command':'',
+'CollectionId':'',
+'Nonce':'',
+'TimeStamp':'',
+'EncryptedBlock':'',
+'EncryptedBlockLength':'',
+'EnhancedGcm':''
+}
+BinaryValues={
+'CollectionId':b'',
+'Nonce':b'',
+'TimeStamp':b'',
+'EncryptedBlock':b'',
+'EnhancedGcm':b'',
+'aad':b'',
+'tag':b'',
+'ciphertext':b'',
+'IV':b''
+}
+class Variable(IntEnum):
+    Null = 0
+    Version = 1
+    CollectionId = 2
+    Command = 3
+    ReturnCode = 4
+    CloudPrinterId = 6
+    DeviceDescriptor = 7
+    TimeStamp = 8 
+    PrinterStatus = 13
+    EncryptedBlock = 16
+    Padding = 17
+    AppFlagsAck = 18
+    Nonce = 19
+    EnhanceGcm = 20
+Commands = {
+    0: "Reserved",
+    1: "GetCollection",
+    2: "ChangePollingFreq",
+    3: "ChangeRetryGraceCnt"
+}
+
+def find_length(tlv):
+    var_name = (tlv & HEADER_MASK) >> 3
+    if tlv & HEADER_LEN_MASK == TLV_BIG:
+        length = TLV_BIG_LEN_IN_BITS
+    elif tlv & HEADER_LEN_MASK == TLV_EXTRA_BYTE:
+        length = TLV_EXTRA_BYTE_LEN_IN_BYTES
+    else:
+        length = tlv & HEADER_LEN_MASK
+    return length,var_name
+
 def conversion():
-    data = {}
-    decimal_values = list(stored_binary_data)
-    version_found = False
-    command_found = False
-    collection_id_found = False
-    nonce_found = False
-    timestamp_found = False
-    encrypted_block_found = False
-    version = ""
-    command = ""
-    collection_id = ""
-    nonce = ""
-    timestamp = ""
-    encrypted_block = ""
-    other = ""
-    i = 0
-    while i < len(decimal_values):
-        if decimal_values[i] == 9 and not version_found:
-            version = decimal_values[i+1]
-            binary_string = bin(version)
-            binary_number = int(binary_string, 2)
-            shifted_binary = binary_number >> 5
-            version = shifted_binary
-            data["version"] = version
-            i = i+1
-            version_found = True
-        elif decimal_values[i] == 25 and not command_found:
-            command = decimal_values[i+1]
-            data["command"] = command
-            i = i+1
-            command_found = True
-        elif decimal_values[i] == 22 or decimal_values[i] == 20 and not collection_id_found:
-            ascii_list=[]
-            i=i+1
-            while(i>4 and i<21 and decimal_values[i]!= 156):
-                ascii_list.append(decimal_values[i])
-                i=i+1
-            collection_id = ''.join(chr(code) for code in ascii_list)
-            data["collection_id"] = collection_id
-            collection_id_found = True
-            i=i-1
-        elif decimal_values[i] == 156 and not nonce_found:
-            ascii_list=[]
-            i=i+1
-            while(i>9 and i<54 and decimal_values[i]!=68):
-                ascii_list.append(decimal_values[i])
-                i=i+1
-            nonce = ' '.join(map(str, ascii_list))
-            data["nonce"] = nonce
-            nonce_found = True
-            i=i-1
-        elif decimal_values[i] == 68 and not timestamp_found:
-            int_array = [decimal_values[i+1], decimal_values[i+2], decimal_values[i+3], decimal_values[i+4]]
-            hex_timestamp = ''.join(map(str, int_array))
-            time = int(hex_timestamp, 16)
-            datetime_obj = datetime.datetime.fromtimestamp(time)
-            timestamp = datetime_obj.strftime('%Y-%m-%d %H:%M:%S')
-            data["timestamp"] = timestamp
-            i = i+4
-            timestamp_found = True
-        elif decimal_values[i] == 134 and not encrypted_block_found:
-            encrypted_block = decimal_values[i+1]
-            data["encrypted_block"] = encrypted_block
-            i = i+1
-            encrypted_block_found = True
+    index=0
+    while index < len(stored_binary_data):
+        char = stored_binary_data[index]
+        length,var_name=find_length(char)
+        if Variable(var_name).name == "Null":
+            index+=length
         else:
-            other += str(decimal_values[i]) + " "
-        i += 1
-    data['other'] = other
-    return data
+            if length == TLV_BIG_LEN_IN_BITS:
+                index+=1
+                length=stored_binary_data[index]
+            elif length == TLV_EXTRA_BYTE_LEN_IN_BYTES:
+                index+=1
+                length = 0x0100 | stored_binary_data[index] 
+                
+        if Variable(var_name).name == "Version":
+            index+=1
+            major = (stored_binary_data[index] & 0x70) >> 5
+            minor = (stored_binary_data[index] & 0x1F)
+            Values['Version'] = str(major)+"."+str(minor)
+
+        elif Variable(var_name).name == "Command":
+            index+=1
+            Values['Command']=stored_binary_data[index]
+            if Values['Command'] == 1:
+                  print(Commands[1])
+            elif Values['Command'] == 0:
+                  print(Commands[0])
+            elif Values['Command'] == 2:
+                  print(Commands[2])
+            else:
+                  print(Commands[3])        
+
+        elif Variable(var_name).name == "CollectionId":
+            i=index+length
+            ascii_list=[]
+            BinaryValues['IV']=stored_binary_data[index+1:i+1]
+            BinaryValues['CollectionId']=stored_binary_data[index+1:i+1]
+            while index<i:
+                index+=1
+                ascii_list.append(stored_binary_data[index])
+            Values['CollectionId']=''.join(chr(key) for key in ascii_list)
+
+        elif Variable(var_name).name == "Nonce":
+            i=index+length
+            BinaryValues['IV']+=stored_binary_data[index+1:i+1]
+            BinaryValues['Nonce']=stored_binary_data[index+1:i+1]
+            ascii_list=[]
+            while index<i:
+                index+=1
+                ascii_list.append(str(stored_binary_data[index]))
+            Values['Nonce']=' '.join(key for key in ascii_list)
+
+        elif Variable(var_name).name == "TimeStamp":
+            i=index+length
+            ascii_list=[]
+            BinaryValues['IV']+=stored_binary_data[index+1:i+1]
+            BinaryValues['TimeStamp']=stored_binary_data[index+1:i+1]
+            while index<i:
+                index+=1
+                ascii_list.append(stored_binary_data[index])
+            hex_timestamp = ''.join(map(str, ascii_list))
+            Values['TimeStamp']   = hex_timestamp 
+
+        elif Variable(var_name).name == "EncryptedBlock":
+            BinaryValues['aad']=stored_binary_data[0:index+1]
+            print("AAd",BinaryValues['aad'])
+            i=index+length
+            BinaryValues['EncryptedBlock']=stored_binary_data[index+1:i+1]
+            BinaryValues['ciphertext']=stored_binary_data[index+1:i+1]
+            print("CipherText",BinaryValues['ciphertext'])
+            ascii_list=[]
+            while index<i:
+                index+=1
+                ascii_list.append(stored_binary_data[index])
+            Values['EncryptedBlock']=' '.join(map(str, ascii_list))
+
+        elif Variable(var_name).name == "EnhanceGcm":
+            i=index+length
+            ascii_list=[]
+            BinaryValues['tag']=stored_binary_data[index+1:i+1]
+            BinaryValues['EnhancedGcm']=stored_binary_data[index+1:i+1]
+            while index<i:
+                index+=1
+                ascii_list.append(stored_binary_data[index])
+            Values['EnhancedGcm']=' '.join(map(str,ascii_list))
+        else:
+            print("Other")
+
+        index += 1
+    return Values
 @app.route('/',methods = ['GET'])
 def home_page():
     return render_template('home.html')
@@ -99,7 +184,7 @@ def update_configuration():
 
 @app.route('/view_metrics',methods = ['GET'])
 def view_metrics():
-    return render_template('ViewMetrics.html')
+    return render_template('ViewMetrics.html', data=sample_data)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
@@ -108,6 +193,11 @@ def duration_test():
 @app.route('/packet_decoder',methods = ['GET'])
 def packet_decoder():
     return render_template('PacketDecoder.html')
+
+@app.route('/get_data')
+def get_data():
+
+    return jsonify(sample_data)
 
 @app.route('/update_config_data', methods = ['POST'])
 def update_config_data():
