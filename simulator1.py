@@ -548,12 +548,12 @@ def post_json():
     if request.method == 'POST':
         if request.data:
             stored_binary_data = request.data
-            return SignalingData.response_packet(),200
+            return 'Success data recevied',200
         else:
             return 'No data is received', 400
     elif request.method == 'GET':
         if stored_binary_data:
-            return success_frame, 200
+            return SignalingData.response_packet(), 200
         else:
             return error_frame,400
 
