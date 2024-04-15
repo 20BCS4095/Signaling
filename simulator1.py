@@ -3,23 +3,37 @@ from flask import Flask, jsonify, redirect, request, render_template, url_for
 import datetime
 from datetime import datetime
 from enum import IntEnum
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+import secrets
+import time
 app = Flask(__name__)
 
 sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
 download_data = []
 update_config_data = {}
-set_signaling_data = {}
 reset_signaling_data = {}
-stored_binary_data = b''
+stored_binary_data = b""
+
 success_frame = b''
 error_frame = b''
 critical_error_frame = b''
+encrypted_data=b''
+stored_binary =b''
+aad=b''
+nonce=b''
+plaintext=b''
 HEADER_MASK = 0xF8
 HEADER_LEN_MASK = 0x07
 TLV_BIG = 0x06
 TLV_EXTRA_BYTE = 0x07
 TLV_BIG_LEN_IN_BITS = 0xFE
 TLV_EXTRA_BYTE_LEN_IN_BYTES = 0xFD
+GCM_TAG_LEN = 12
+SUPPORTED_MAJOR_VERSION = 2
+SUPPORTED_MINOR_VERSION = 0
+SIG_NONCE_LEN = 4
+
 index = 0
 collection=0
 Values={
@@ -29,8 +43,11 @@ Values={
 'Nonce':'',
 'TimeStamp':'',
 'EncryptedBlock':'',
-'EncryptedBlockLength':'',
-'EnhancedGcm':''
+'EnhancedGcm':'',
+'CloudPrinterId':'',
+'Descriptor':'',
+'PrinterStatus':'',
+'AppFlagAsk':''
 }
 BinaryValues={
 'CollectionId':b'',
@@ -43,6 +60,26 @@ BinaryValues={
 'ciphertext':b'',
 'IV':b''
 }
+
+set_signaling_values = {
+'start_tunnel_1': 0,
+'start_tunnel_2': 0,
+'start_tunnel_3':1,
+'start_tunnel_4':0,
+'echo':0,
+'rtp_kick':0,
+'registration_subscription':0,
+'cdm_pubsub_1':0,
+'cdm_pubsub_2':0,
+'cdm_pubsub_3':0,
+'connectivityConfig':0,
+'device_configuration':0,
+}
+
+class Version():
+    major=SUPPORTED_MAJOR_VERSION
+    minor=SUPPORTED_MINOR_VERSION
+
 class Variable(IntEnum):
     Null = 0
     Version = 1
@@ -52,120 +89,330 @@ class Variable(IntEnum):
     CloudPrinterId = 6
     DeviceDescriptor = 7
     TimeStamp = 8 
+    CollectionContent = 11
+    AppFlags = 12
     PrinterStatus = 13
+    ReplyExpiration = 14
+    SignatureGcm  = 15
     EncryptedBlock = 16
     Padding = 17
     AppFlagsAck = 18
     Nonce = 19
     EnhanceGcm = 20
-Commands = {
-    0: "Reserved",
-    1: "GetCollection",
-    2: "ChangePollingFreq",
-    3: "ChangeRetryGraceCnt"
-}
 
-def find_length(tlv):
-    var_name = (tlv & HEADER_MASK) >> 3
-    if tlv & HEADER_LEN_MASK == TLV_BIG:
-        length = TLV_BIG_LEN_IN_BITS
-    elif tlv & HEADER_LEN_MASK == TLV_EXTRA_BYTE:
-        length = TLV_EXTRA_BYTE_LEN_IN_BYTES
-    else:
-        length = tlv & HEADER_LEN_MASK
-    return length,var_name
+class ReturnCode(IntEnum):
+    Ok = 0x1
+    NoUpdate = 0x2
+    SyntaxError = 0x81
+    SignatureMismatch = 0x82
+    VersionUnsupported = 0x83
+    CollectionUnknown = 0x84
+    ServerUnavailable = 0x85
 
-def conversion():
-    index=0
-    while index < len(stored_binary_data):
-        char = stored_binary_data[index]
-        length,var_name=find_length(char)
-        if Variable(var_name).name == "Null":
-            index+=length
-        else:
-            if length == TLV_BIG_LEN_IN_BITS:
-                index+=1
-                length=stored_binary_data[index]
-            elif length == TLV_EXTRA_BYTE_LEN_IN_BYTES:
-                index+=1
-                length = 0x0100 | stored_binary_data[index] 
-                
-        if Variable(var_name).name == "Version":
-            index+=1
-            major = (stored_binary_data[index] & 0x70) >> 5
-            minor = (stored_binary_data[index] & 0x1F)
-            Values['Version'] = str(major)+"."+str(minor)
+class Commands(IntEnum):
+    Reserved = 0x0
+    GetCollection = 0x1
+    ChangePollingFreq = 0x2
+    ChangeRetryGraceCnt = 0x3
 
-        elif Variable(var_name).name == "Command":
-            index+=1
-            Values['Command']=stored_binary_data[index]
-            if Values['Command'] == 1:
-                  print(Commands[1])
-            elif Values['Command'] == 0:
-                  print(Commands[0])
-            elif Values['Command'] == 2:
-                  print(Commands[2])
+class ApplicationType(IntEnum):
+    start_tunnel_1 = 0
+    start_tunnel_2 = 1
+    start_tunnel_3 = 2
+    start_tunnel_4 = 3
+    echo = 4
+    rtp_kick = 5
+    fw_update = 6
+    registration_subscription = 7
+    cdm_pubsub_1 = 8
+    cdm_pubsub_2 = 9
+    cdm_pubsub_3 = 10
+    connectivityConfig =11
+    device_configuration = 12
+
+class SignalingData:
+    VariableLengthLimits_ = {
+        Variable.Null:                     (0, 0),
+        Variable.Version:                  (1, 2),
+        Variable.CollectionId:            (4, 16),
+        Variable.Command:                 (5, 17),
+        Variable.ReturnCode:              (1, 1),
+        Variable.CloudPrinterId:          (32, 48),
+        Variable.DeviceDescriptor:         (4, 8),
+        Variable.TimeStamp:               (5, 5), 
+        Variable.CollectionContent:       (400,512),
+        Variable.AppFlags:                (5,16),
+        Variable.PrinterStatus:           (5, 6),
+        Variable.EncryptedBlock:          (512, 1024),
+        Variable.Padding:                 (16, 32),
+        Variable.AppFlagsAck:             (5, 16),
+        Variable.Nonce:                  (4, 32),
+        Variable.EnhanceGcm:             (16, 32),
+        Variable.ReplyExpiration:        (2,4),
+        Variable.SignatureGcm:            (12,32)
+    }
+
+    @staticmethod
+    def encode_tlv(name, length):  
+        tlv = 0
+        if length <= SignalingData.VariableLengthLimits_[name][1]:
+            if length <= 5:
+                tlv_small = length
+                tlv = ((name << 3) | tlv_small)
             else:
-                  print(Commands[3])        
+                tlv = ((name << 3) | TLV_BIG)
+        return tlv
+    
+    def convert_to_bytes(key):
+        bytes_data = str.encode(key)
+        return bytes_data
 
-        elif Variable(var_name).name == "CollectionId":
-            i=index+length
-            ascii_list=[]
-            BinaryValues['IV']=stored_binary_data[index+1:i+1]
-            BinaryValues['CollectionId']=stored_binary_data[index+1:i+1]
-            while index<i:
-                index+=1
-                ascii_list.append(stored_binary_data[index])
-            Values['CollectionId']=''.join(chr(key) for key in ascii_list)
+    def gcm_parameter():
+        key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
+        nonce=BinaryValues['IV']
+        ciphertext=BinaryValues['ciphertext']
+        tag=BinaryValues['tag']
+        aad=BinaryValues['aad']
+        return key,nonce,ciphertext,tag,aad
 
-        elif Variable(var_name).name == "Nonce":
-            i=index+length
-            BinaryValues['IV']+=stored_binary_data[index+1:i+1]
-            BinaryValues['Nonce']=stored_binary_data[index+1:i+1]
-            ascii_list=[]
-            while index<i:
-                index+=1
-                ascii_list.append(str(stored_binary_data[index]))
-            Values['Nonce']=' '.join(key for key in ascii_list)
-
-        elif Variable(var_name).name == "TimeStamp":
-            i=index+length
-            ascii_list=[]
-            BinaryValues['IV']+=stored_binary_data[index+1:i+1]
-            BinaryValues['TimeStamp']=stored_binary_data[index+1:i+1]
-            while index<i:
-                index+=1
-                ascii_list.append(stored_binary_data[index])
-            hex_timestamp = ''.join(map(str, ascii_list))
-            Values['TimeStamp']   = hex_timestamp 
-
-        elif Variable(var_name).name == "EncryptedBlock":
-            BinaryValues['aad']=stored_binary_data[0:index+1]
-            print("AAd",BinaryValues['aad'])
-            i=index+length
-            BinaryValues['EncryptedBlock']=stored_binary_data[index+1:i+1]
-            BinaryValues['ciphertext']=stored_binary_data[index+1:i+1]
-            print("CipherText",BinaryValues['ciphertext'])
-            ascii_list=[]
-            while index<i:
-                index+=1
-                ascii_list.append(stored_binary_data[index])
-            Values['EncryptedBlock']=' '.join(map(str, ascii_list))
-
-        elif Variable(var_name).name == "EnhanceGcm":
-            i=index+length
-            ascii_list=[]
-            BinaryValues['tag']=stored_binary_data[index+1:i+1]
-            BinaryValues['EnhancedGcm']=stored_binary_data[index+1:i+1]
-            while index<i:
-                index+=1
-                ascii_list.append(stored_binary_data[index])
-            Values['EnhancedGcm']=' '.join(map(str,ascii_list))
+    def decode_Tlv(tlv):
+        var_name = (tlv & HEADER_MASK) >> 3
+        if tlv & HEADER_LEN_MASK == TLV_BIG:
+            length = TLV_BIG_LEN_IN_BITS
+        elif tlv & HEADER_LEN_MASK == TLV_EXTRA_BYTE:
+            length = TLV_EXTRA_BYTE_LEN_IN_BYTES
         else:
-            print("Other")
+            length = tlv & HEADER_LEN_MASK
+        return length,var_name
+        
+    def convert_decimaltohexabinary(stored):
+        request_value = [char for char in stored]
+        request_data = ' '.join(map(str, request_value))
+        bytes_list = request_data.split()
+        byte_values = [int(byte_str) for byte_str in bytes_list]
+        binary_data = bytes(byte_values)
+        return binary_data
+    
+    def aes_gcm_encrypt(key, nonce, plaintext, aad):
+        #key =signature Key,nonce=IV==enhance signature
+        #aad=unencrypted section including encrypted block key and value length
+        cipher = Cipher(
+        algorithms.AES(key),
+        modes.GCM(nonce),
+        backend=default_backend()
+        )
+        encryptor = cipher.encryptor()
+        encryptor.authenticate_additional_data(aad)
+        ciphertext = encryptor.update(plaintext) + encryptor.finalize()
+        tag = encryptor.tag[:12]
+        return (ciphertext, tag)
+    
+    def aes_gcm_decrypt(key, nonce, ciphertext, tag, aad):
+        cipher = Cipher(
+        algorithms.AES(key),
+        modes.GCM(nonce, tag, min_tag_length=12),
+        backend=default_backend
+        )
+        decryptor = cipher.decryptor()
+        decryptor.authenticate_additional_data(aad)
+        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+        return plaintext
+    
+    def convert_to_bytes(key):
+        bytes_data = str.encode(key)
+        return bytes_data
+    
+    def appFlagSet():
+        first_eight_string = ''.join(str(set_signaling_values[key]) for key in reversed(list(set_signaling_values)[:8]))
+        rest_string = ''.join(str(set_signaling_values[key]) for key in reversed(list(set_signaling_values)[8:]))
+        first_eight_int = int(first_eight_string, 2)
+        rest_int = int(rest_string, 2)
+        first_eight_hex = hex(first_eight_int)
+        rest_hex = hex(rest_int)
+        return first_eight_hex,rest_hex
 
-        index += 1
-    return Values
+    def RequestPacketDecode(stored_binary_data):
+        index=0
+        while index < len(stored_binary_data):
+            char = stored_binary_data[index]
+            length,var_name=SignalingData.decode_Tlv(char)
+            if Variable(var_name).name == "Null":
+              index+=length
+            else:
+                if length == TLV_BIG_LEN_IN_BITS:
+                  index+=1
+                  length=stored_binary_data[index]
+                elif length == TLV_EXTRA_BYTE_LEN_IN_BYTES:
+                  index+=1
+                  length = 0x0100 | stored_binary_data[index] 
+       
+            if Variable(var_name).name == "Version":
+                index+=1
+                major = (stored_binary_data[index] & 0x70) >> 5
+                minor = (stored_binary_data[index] & 0x1F)
+                Values['Version'] = str(major)+"."+str(minor)
+
+            elif Variable(var_name).name == "Command":
+                index+=1
+                Values['Command']=stored_binary_data[index]
+                if Values['Command'] == 1:
+                  print(Commands.GetCollection)
+                elif Values['Command'] == 0:
+                  print(Commands.Reserved)
+                elif Values['Command'] == 2:
+                  print(Commands.ChangePollingFreq)
+                else:
+                  print(Commands.ChangeRetryGraceCnt)        
+
+            elif Variable(var_name).name == "CollectionId":
+                i=index+length
+                ascii_list=[]
+                BinaryValues['IV']=stored_binary_data[index+1:i+1]
+                BinaryValues['CollectionId']=stored_binary_data[index+1:i+1]
+                while index<i:
+                    index+=1
+                    ascii_list.append(stored_binary_data[index])
+                Values['CollectionId']=''.join(chr(key) for key in ascii_list)
+
+            elif Variable(var_name).name == "Nonce":
+                i=index+length
+                BinaryValues['IV']+=stored_binary_data[index+1:i+1]
+                BinaryValues['Nonce']=stored_binary_data[index+1:i+1]
+                ascii_list=[]
+                while index<i:
+                   index+=1
+                   ascii_list.append(str(stored_binary_data[index]))
+                Values['Nonce']=' '.join(key for key in ascii_list)
+
+            elif Variable(var_name).name == "TimeStamp":
+               i=index+length
+               ascii_list=[]
+               BinaryValues['IV']+=stored_binary_data[index+1:i+1]
+               BinaryValues['TimeStamp']=stored_binary_data[index+1:i+1]
+               while index<i:
+                index+=1
+                ascii_list.append(stored_binary_data[index])
+               hex_timestamp = ''.join(map(str, ascii_list))
+               Values['TimeStamp']   = hex_timestamp 
+
+            elif Variable(var_name).name == "EncryptedBlock":
+                BinaryValues['aad']=stored_binary_data[0:index+1]
+                i=index+length
+                BinaryValues['EncryptedBlock']=stored_binary_data[index+1:i+1]
+                BinaryValues['ciphertext']=stored_binary_data[index+1:i+1]
+                ascii_list=[]
+                while index<i:
+                  index+=1
+                  ascii_list.append(stored_binary_data[index])
+                Values['EncryptedBlock']=' '.join(map(str, ascii_list))
+
+            elif Variable(var_name).name == "EnhanceGcm":
+               i=index+length
+               ascii_list=[]
+               BinaryValues['tag']=stored_binary_data[index+1:i+1]
+               BinaryValues['EnhancedGcm']=stored_binary_data[index+1:i+1]
+               while index<i:
+                index+=1
+                ascii_list.append(stored_binary_data[index])
+               Values['EnhancedGcm']=' '.join(map(str,ascii_list))
+
+            elif Variable(var_name).name == "CloudPrinterId":
+               i=index+length
+               BinaryValues['CloudPrinterId']=stored_binary_data[index+1:i+1]
+               ascii_list=[]
+               while index<i:
+                index+=1
+                ascii_list.append(stored_binary_data[index])
+               Values['CloudPrinterId']=''.join(chr(key) for key in ascii_list)
+
+            elif Variable(var_name).name == "DeviceDescriptor":
+              i=index+length
+              BinaryValues['Descriptor']=stored_binary_data[index+1:i+1]
+              index=i
+              Values['Descriptor'] = int.from_bytes(BinaryValues['Descriptor'], byteorder='big')
+
+            elif Variable(var_name).name == "AppFlagsAck":
+              i=index+length
+              Values['AppFlagAsk'] = stored_binary_data[index+1:i+1]
+              index=i
+
+            elif Variable(var_name).name == "PrinterStatus":
+              i=index+length
+              Values['PrinterStatus']=stored_binary_data[index+1:i+1]
+              index=i
+            else:
+              print("Other")
+            index += 1
+        return Values
+
+    def response_packet():
+        index=0
+        decimal_values=[]
+        encrypted_values=[]
+        enhance_gcm=[]
+        #--------------------------------Return Code---------------------------#
+        encrypted_values.append((SignalingData.encode_tlv(Variable.ReturnCode,1)))
+        encrypted_values.append(int(ReturnCode.Ok))
+        #----------------------------ReplyExpiration----------------------------#
+        encrypted_values.append(SignalingData.encode_tlv(Variable.ReplyExpiration,2))
+        encrypted_values.append(22)
+        encrypted_values.append(12)
+        #-------------------------------App Flag--------------------------#
+        x,y=SignalingData.appFlagSet()
+        if y=='0x0':
+           encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,1))
+           encrypted_values.append(int(x,16)) 
+        else:
+            encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,2))
+            encrypted_values.append(int(x,16))
+            encrypted_values.append(int(y,16))
+        #---------------------------Collection Content-------------------#
+        encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,5))
+        encrypted_values.append(36)
+        encrypted_values.append(128)
+        encrypted_values.append(8)
+        encrypted_values.append(63)
+        encrypted_values.append(25)
+        #-----------------------------Command--------------------------#
+        encrypted_values.append(SignalingData.encode_tlv(Variable.Command,1))
+        encrypted_values.append(int(Commands.ChangePollingFreq))
+        #-----------------------------Padding--------------------------
+        #encrypted_values.append(SignalingData.encode_tlv(Variable.Padding,1))
+        #---------------------------------Version------------------------------#
+        decimal_values.append(SignalingData.encode_tlv(Variable.Version, 1))
+        decimal_values.append(Version.major<<5 | Version.minor)
+        #--------------------------------Collection ID----------------------------------#
+        decimal_values.append(SignalingData.encode_tlv(Variable.CollectionId,len(Values['CollectionId'])))
+        decimal_values += [ord(char) for char in Values['CollectionId']]
+        enhance_gcm+=[ord(char) for char in Values['CollectionId']]
+        #-------------------------------NONCE-----------------------------------------#
+        decimal_values.append(SignalingData.encode_tlv(Variable.Nonce,SIG_NONCE_LEN))
+        random_bits = secrets.token_bytes(SIG_NONCE_LEN)
+        while index<SIG_NONCE_LEN:
+            decimal_values.append(random_bits[index])
+            enhance_gcm.append(random_bits[index])
+            index+=1
+        #----------------------------ReplyTimeStamp-----------------------------------#
+        decimal_values.append(SignalingData.encode_tlv(Variable.TimeStamp,4))
+        current_time =int(time.time())
+        hex_output = hex(current_time)[2:].upper()
+        hex_digits = [hex_output[i:i+2] for i in range(0, len(hex_output), 2)]
+        for x in hex_digits:
+            decimal_values.append(int(x,16))
+            enhance_gcm.append(int(x,16))
+        #---------------------------Encrypted Block-------------------------------------#
+        decimal_values.append(SignalingData.encode_tlv(Variable.EncryptedBlock,1))
+        decimal_values.append(len(encrypted_values))
+        #------------------------------------------------------------------------
+        aad=SignalingData.convert_decimaltohexabinary(decimal_values)
+        plaintext=SignalingData.convert_decimaltohexabinary(encrypted_values)
+        nonce=SignalingData.convert_decimaltohexabinary(enhance_gcm)
+        key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
+        result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
+        de=SignalingData.aes_gcm_decrypt(key,nonce,result[0],result[1],aad)
+        stored_binary_data= bytes(aad+result[0]+bytes([SignalingData.encode_tlv(Variable.EnhanceGcm,GCM_TAG_LEN)])+bytes([len(result[1])])+result[1])
+        return stored_binary_data
+    
 @app.route('/',methods = ['GET'])
 def home_page():
     return render_template('home.html')
@@ -236,8 +483,8 @@ def update_config_data():
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
     if request.method == 'POST':
-        global set_signaling_data
-        set_signaling_data = {
+        global set_signaling_values
+        set_signaling_values = {
             'update_configuration': request.form['update_configuration'],
             'start_tunnel_1': request.form['start_tunnel_1'],
             'start_tunnel_2': request.form['start_tunnel_2'],
@@ -301,7 +548,7 @@ def post_json():
     if request.method == 'POST':
         if request.data:
             stored_binary_data = request.data
-            return 'Binary data received successfully',200
+            return SignalingData.response_packet(),200
         else:
             return 'No data is received', 400
     elif request.method == 'GET':
@@ -314,10 +561,13 @@ def post_json():
 def get_json():
     global stored_binary_data
     if stored_binary_data:
-        decimal_values = [char for char in stored_binary_data]
-        decimal_string = ' '.join(map(str, decimal_values))
-        data=conversion()
-        return render_template('index.html', data=decimal_string, binary_data=stored_binary_data, data1=data)
+        request_value = [char for char in stored_binary_data]
+        request_data = ' '.join(map(str, request_value))
+        decoder_value=SignalingData.RequestPacketDecode(stored_binary_data)
+        key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
+        encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
+        encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
+        return render_template('index.html', data=request_data, binary_data=stored_binary_data, data1=decoder_value,encrypt=encrypted_value)
     else:
         return 'No binary data stored', 404
 
