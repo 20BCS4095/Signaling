@@ -410,8 +410,8 @@ class SignalingData:
         key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
         result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
         de=SignalingData.aes_gcm_decrypt(key,nonce,result[0],result[1],aad)
-        stored_binary_data= bytes(aad+result[0]+bytes([SignalingData.encode_tlv(Variable.EnhanceGcm,GCM_TAG_LEN)])+bytes([len(result[1])])+result[1])
-        return stored_binary_data
+        stored_binary= bytes(aad+result[0]+bytes([SignalingData.encode_tlv(Variable.EnhanceGcm,GCM_TAG_LEN)])+bytes([len(result[1])])+result[1])
+        return stored_binary
     
 @app.route('/',methods = ['GET'])
 def home_page():
@@ -553,7 +553,8 @@ def post_json():
             return 'No data is received', 400
     elif request.method == 'GET':
         if stored_binary_data:
-            return SignalingData.response_packet(), 200
+            success_frame=SignalingData.response_packet()
+            return success_frame, 200
         else:
             return error_frame,400
 
