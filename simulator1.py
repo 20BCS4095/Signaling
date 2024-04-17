@@ -64,9 +64,9 @@ BinaryValues={
 set_signaling_values = {
 'start_tunnel_1': 0,
 'start_tunnel_2': 0,
-'start_tunnel_3':1,
+'start_tunnel_3':0,
 'start_tunnel_4':0,
-'echo':0,
+'echo':1,
 'rtp_kick':0,
 'registration_subscription':0,
 'cdm_pubsub_1':0,
@@ -598,6 +598,10 @@ def post_json():
     if request.method == 'POST':
         if request.data:
             stored_binary_data = request.data
+            decoder_value=SignalingData.RequestPacketDecode(stored_binary_data)
+            key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
+            encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
+            encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             success_frame=SignalingData.response_packet()
             return success_frame,200
         else:
