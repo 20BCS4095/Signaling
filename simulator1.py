@@ -242,6 +242,7 @@ class SignalingData:
        ascii.append(first) 
     
     def collectionBitmap(descriptor):
+        ascii=[]
        last=125
        first=int(descriptor/8)-1
        byte=int(descriptor%8)
