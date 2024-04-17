@@ -13,8 +13,8 @@ sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
 download_data = []
 update_config_data = {}
 reset_signaling_data = {}
-stored_binary_data = b""
-
+stored_binary_data = b''
+ascii=[]
 success_frame = b''
 error_frame = b''
 critical_error_frame = b''
@@ -45,7 +45,7 @@ Values={
 'EncryptedBlock':'',
 'EnhancedGcm':'',
 'CloudPrinterId':'',
-'Descriptor':'',
+'Descriptor':'0',
 'PrinterStatus':'',
 'AppFlagAsk':''
 }
@@ -231,6 +231,57 @@ class SignalingData:
         rest_hex = hex(rest_int)
         return first_eight_hex,rest_hex
 
+    def singleRleHeader(first):
+       global ascii
+       ascii.append(first)
+
+    def extendedRleHeader(first):
+       global ascii
+       ascii.append(192)
+       ascii.append(0)
+       ascii.append(first) 
+    
+    def collectionBitmap(descriptor):
+       last=125
+       first=int(descriptor/8)-1
+       byte=int(descriptor%8)
+       lastvalue=125-int(descriptor/8)-2
+       firstBool=True
+       middleBool=True
+       lastBool=True
+       while last>0:
+        if descriptor%8==0:
+            first-=1
+        if firstBool:
+            if first>=0 and first<64:
+                SignalingData.singleRleHeader(first)
+            elif first>=64:
+                SignalingData.extendedRleHeader(first)
+            last=last-first
+            firstBool=False
+            middleBool=True
+        elif middleBool:
+            if descriptor!=0:
+                last -=1
+                ascii.append(128)
+                msb_position = byte
+                if byte==0:
+                  msb_position=8
+                value = 1 << (7 - (msb_position - 1))
+                ascii.append(value)
+            middleBool=False
+            lastBool=True
+        elif lastBool:
+            if descriptor%8==0:
+                lastvalue+=1
+            if lastvalue>=0 and lastvalue<64:
+                SignalingData.singleRleHeader(lastvalue)
+            elif lastvalue>=64:
+                SignalingData.extendedRleHeader(lastvalue)
+            lastBool=False
+            last=0
+       return ascii
+
     def RequestPacketDecode(stored_binary_data):
         index=0
         while index < len(stored_binary_data):
@@ -368,11 +419,9 @@ class SignalingData:
             encrypted_values.append(int(y,16))
         #---------------------------Collection Content-------------------#
         encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,5))
-        encrypted_values.append(36)
-        encrypted_values.append(128)
-        encrypted_values.append(8)
-        encrypted_values.append(63)
-        encrypted_values.append(25)
+        a=SignalingData.collectionBitmap(int(Values['Descriptor']))
+        for x in a:
+           encrypted_values.append(x)
         #-----------------------------Command--------------------------#
         encrypted_values.append(SignalingData.encode_tlv(Variable.Command,1))
         encrypted_values.append(int(Commands.ChangePollingFreq))
@@ -546,16 +595,16 @@ def reset_signaling_data():
 def post_json():
     global stored_binary_data 
     global success_frame
-    global error_frame
     if request.method == 'POST':
         if request.data:
             stored_binary_data = request.data
-            return 'Success data recevied',200
+            return 'Success data received',200
         else:
             return 'No data is received', 400
     elif request.method == 'GET':
         if stored_binary_data:
             success_frame=SignalingData.response_packet()
+            print(success_frame)
             return success_frame, 200
         else:
             return error_frame,400
