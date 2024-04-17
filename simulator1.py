@@ -621,11 +621,7 @@ def get_json():
     if stored_binary_data:
         request_value = [char for char in stored_binary_data]
         request_data = ' '.join(map(str, request_value))
-        decoder_value=SignalingData.RequestPacketDecode(stored_binary_data)
-        key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
-        encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
-        encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
-        return render_template('index.html', data=request_data, binary_data=stored_binary_data, data1=decoder_value,encrypt=encrypted_value)
+        return render_template('index.html', data=request_data, binary_data=stored_binary_data, data1=Values)
     else:
         return 'No binary data stored', 404
 
