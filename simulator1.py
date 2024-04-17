@@ -89,7 +89,7 @@ class Variable(IntEnum):
     CloudPrinterId = 6
     DeviceDescriptor = 7
     TimeStamp = 8 
-    CurrentEpochTime=10
+    EpochTimeCurrReply=9
     CollectionContent = 11
     AppFlags = 12
     PrinterStatus = 13
@@ -141,7 +141,7 @@ class SignalingData:
         Variable.CloudPrinterId:          (32, 48),
         Variable.DeviceDescriptor:         (4, 8),
         Variable.TimeStamp:               (5, 5), 
-        Variable.CurrentEpochTime:         (5,5),
+        Variable.EpochTimeCurrReply:         (5,5),
         Variable.CollectionContent:       (400,512),
         Variable.AppFlags:                (5,16),
         Variable.PrinterStatus:           (5, 6),
@@ -445,7 +445,7 @@ class SignalingData:
             enhance_gcm.append(random_bits[index])
             index+=1
         #----------------------------ReplyTimeStamp-----------------------------------#
-        decimal_values.append(SignalingData.encode_tlv(Variable.CurrentEpochTime,4))
+        decimal_values.append(SignalingData.encode_tlv(Variable.EpochTimeCurrReply,4))
         current_time =int(time.time())
         hex_output = hex(current_time)[2:].upper()
         hex_digits = [hex_output[i:i+2] for i in range(0, len(hex_output), 2)]
