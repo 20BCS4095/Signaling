@@ -435,6 +435,7 @@ class SignalingData:
         #-----------------------------Command--------------------------#
         encrypted_values.append(SignalingData.encode_tlv(Variable.Command,1))
         encrypted_values.append(int(Commands.ChangePollingFreq))
+        encrypted_values.append(5)
         #-----------------------------Padding--------------------------
         #encrypted_values.append(SignalingData.encode_tlv(Variable.Padding,1))
         #---------------------------------Version------------------------------#
