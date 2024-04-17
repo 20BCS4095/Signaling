@@ -421,10 +421,17 @@ class SignalingData:
             encrypted_values.append(int(x,16))
             encrypted_values.append(int(y,16))
         #---------------------------Collection Content-------------------#
-        encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,5))
+        a=[]
         a=SignalingData.collectionBitmap(int(Values['Descriptor']))
-        for x in a:
-           encrypted_values.append(x)
+        if len(a)>5:
+           encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+           encrypted_values.append(len(a))
+           for x in a:
+              encrypted_values.append(x)
+        else:
+           encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+           for x in a:
+              encrypted_values.append(x)
         #-----------------------------Command--------------------------#
         encrypted_values.append(SignalingData.encode_tlv(Variable.Command,1))
         encrypted_values.append(int(Commands.ChangePollingFreq))
