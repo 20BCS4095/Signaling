@@ -613,6 +613,7 @@ def post_json():
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             success_frame=SignalingData.response_packet()
+            print(success_frame)
             return success_frame,200
         else:
             return 'No data is received', 400
