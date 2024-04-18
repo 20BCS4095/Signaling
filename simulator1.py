@@ -14,7 +14,6 @@ download_data = []
 update_config_data = {}
 reset_signaling_data = {}
 stored_binary_data = b''
-ascii=[]
 success_frame = b''
 error_frame = b''
 critical_error_frame = b''
@@ -232,18 +231,9 @@ class SignalingData:
         first_eight_hex = hex(first_eight_int)
         rest_hex = hex(rest_int)
         return first_eight_hex,rest_hex
-
-    def singleRleHeader(first):
-       global ascii
-       ascii.append(first)
-
-    def extendedRleHeader(first):
-       global ascii
-       ascii.append(192)
-       ascii.append(0)
-       ascii.append(first) 
     
     def collectionBitmap(descriptor):
+       ascii=[]
        last=125
        first=int(descriptor/8)-1
        byte=int(descriptor%8)
@@ -256,9 +246,11 @@ class SignalingData:
             first-=1
         if firstBool:
             if first>=0 and first<64:
-                SignalingData.singleRleHeader(first)
+                ascii.append(first)
             elif first>=64:
-                SignalingData.extendedRleHeader(first)
+                ascii.append(192)
+                ascii.append(0)
+                ascii.append(first)
             last=last-first
             firstBool=False
             middleBool=True
@@ -277,9 +269,11 @@ class SignalingData:
             if descriptor%8==0:
                 lastvalue+=1
             if lastvalue>=0 and lastvalue<64:
-                SignalingData.singleRleHeader(lastvalue)
+                ascii.append(lastvalue)
             elif lastvalue>=64:
-                SignalingData.extendedRleHeader(lastvalue)
+                ascii.append(192)
+                ascii.append(0)
+                ascii.append(lastvalue)
             lastBool=False
             last=0
        return ascii
