@@ -60,37 +60,19 @@ BinaryValues={
 'IV':b''
 }
 
-# set_signaling_values = {
-# 'start_tunnel_1': 0,
-# 'start_tunnel_2': 0,
-# 'start_tunnel_3':0,
-# 'start_tunnel_4':0,
-# 'echo':1,
-# 'rtp_kick':0,
-# 'registration_subscription':0,
-# 'cdm_pubsub_1':0,
-# 'cdm_pubsub_2':0,
-# 'cdm_pubsub_3':0,
-# 'connectivityConfig':0,
-# 'device_configuration':0,
-# }
-set_signaling_values= {
-'connectivityConfig':0,   
-'instantInkKick':0,
-'rtp_kick':0,
-'cdm_pubsub_1':0,
-'cdm_pubsub_2':0,
-'cdm_pubsub_3':0,
-'cdmOnDemandDesires':0,
+set_signaling_values = {
 'start_tunnel_1': 0,
 'start_tunnel_2': 0,
 'start_tunnel_3':0,
 'start_tunnel_4':0,
 'echo':1,
-'device_configuration':0,
-'fwUpdate':0,
+'rtp_kick':0,
 'registration_subscription':0,
+'cdm_pubsub_1':0,
+'cdm_pubsub_2':0,
+'cdm_pubsub_3':0,
 'connectivityConfig':0,
+'device_configuration':0,
 }
 
 class Version():
