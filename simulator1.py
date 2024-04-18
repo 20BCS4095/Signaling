@@ -459,6 +459,7 @@ class SignalingData:
         #------------------------------------------------------------------------
         aad=SignalingData.convert_decimaltohexabinary(decimal_values)
         plaintext=SignalingData.convert_decimaltohexabinary(encrypted_values)
+        print(encrypted_values)
         nonce=SignalingData.convert_decimaltohexabinary(enhance_gcm)
         key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
         result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
