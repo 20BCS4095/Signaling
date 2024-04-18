@@ -422,7 +422,6 @@ class SignalingData:
         #---------------------------Collection Content-------------------#
         a=[]
         a=SignalingData.collectionBitmap(int(Values['Descriptor']))
-        print(a)
         if len(a)>5:
            encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
            encrypted_values.append(len(a))
@@ -619,8 +618,7 @@ def post_json():
             return 'No data is received', 400
     elif request.method == 'GET':
         if stored_binary_data:
-            success_frame=SignalingData.response_packet()
-            print(success_frame)
+            # success_frame=SignalingData.response_packet()
             return success_frame, 200
         else:
             return error_frame,400
