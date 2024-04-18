@@ -66,7 +66,7 @@ set_signaling_values = {
 'start_tunnel_2': 0,
 'start_tunnel_3':0,
 'start_tunnel_4':0,
-'echo':0,
+'echo':1,
 'rtp_kick':0,
 'registration_subscription':0,
 'cdm_pubsub_1':0,
