@@ -36,7 +36,7 @@ SIG_NONCE_LEN = 4
 index = 0
 collection=0
 Values={
-'Version':'',
+'Version':'2.0',
 'Command':'',
 'CollectionId':'',
 'Nonce':'',
@@ -72,7 +72,7 @@ set_signaling_values = {
 'start_tunnel_2': 0,
 'start_tunnel_3':0,
 'start_tunnel_4': 0,
-'echo': 1,
+'echo': 0,
 'device_configuration': 0,
 'fw_update': 0,
 'registration_subscription': 0,
@@ -405,9 +405,8 @@ class SignalingData:
         encrypted_values.append((SignalingData.encode_tlv(Variable.ReturnCode,1)))
         encrypted_values.append(int(ReturnCode.Ok))
         #----------------------------ReplyExpiration----------------------------#
-        encrypted_values.append(SignalingData.encode_tlv(Variable.ReplyExpiration,2))
-        encrypted_values.append(22)
-        encrypted_values.append(12)
+        encrypted_values.append(SignalingData.encode_tlv(Variable.ReplyExpiration,1))
+        encrypted_values.append(240)
         #-------------------------------App Flag--------------------------#
         x,y=SignalingData.appFlagSet()
         if y=='0x0':
@@ -436,8 +435,11 @@ class SignalingData:
         #-----------------------------Padding--------------------------
         #encrypted_values.append(SignalingData.encode_tlv(Variable.Padding,1))
         #---------------------------------Version------------------------------#
-        decimal_values.append(SignalingData.encode_tlv(Variable.Version, 1))
-        decimal_values.append(Version.major<<5 | Version.minor)
+        if Values['Version']=="2.0":
+            decimal_values.append(SignalingData.encode_tlv(Variable.Version, 1))
+            decimal_values.append(Version.major<<5 | Version.minor)
+        else:
+            return "Version does not match"
         #--------------------------------Collection ID----------------------------------#
         decimal_values.append(SignalingData.encode_tlv(Variable.CollectionId,len(Values['CollectionId'])))
         decimal_values += [ord(char) for char in Values['CollectionId']]
@@ -458,12 +460,11 @@ class SignalingData:
             decimal_values.append(int(x,16))
             enhance_gcm.append(int(x,16))
         #---------------------------Encrypted Block-------------------------------------#
-        decimal_values.append(SignalingData.encode_tlv(Variable.EncryptedBlock,6))
+        decimal_values.append(SignalingData.encode_tlv(Variable.EncryptedBlock,len(encrypted_values)))
         decimal_values.append(len(encrypted_values))
         #------------------------------------------------------------------------
         aad=SignalingData.convert_decimaltohexabinary(decimal_values)
         plaintext=SignalingData.convert_decimaltohexabinary(encrypted_values)
-        print(encrypted_values)
         nonce=SignalingData.convert_decimaltohexabinary(enhance_gcm)
         key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
         result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
@@ -541,33 +542,29 @@ def update_config_data():
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
     if request.method == 'POST':
-        global set_signaling_values
-        set_signaling_values = {
-            'update_configuration': request.form['update_configuration'],
-            'start_tunnel_1': request.form['start_tunnel_1'],
-            'start_tunnel_2': request.form['start_tunnel_2'],
-            'start_tunnel_3': request.form['start_tunnel_3'],
-            'start_tunnel_4': request.form['start_tunnel_4'],
-            'metrics_push': request.form['metrics_push'],
-            'device_configuration': request.form['device_configuration'],
-            'echo': request.form['echo'],
-            'rtp_kick': request.form['rtp_kick'],
-            'fw_update': request.form['fw_update'],
-            'registration_subscription': request.form['registration_subscription'],
-            'cdm_pubsub_1': request.form['cdm_pubsub_1'],
-            'cdm_pubsub_2': request.form['cdm_pubsub_2'],
-            'cdm_pubsub_3': request.form['cdm_pubsub_3'],
-            'cdm_pubsub_4': request.form['cdm_pubsub_4'],
-            'cdm_ondemand_desires': request.form['cdm_ondemand_desires']
-        }
-
+        global set_signaling_values 
+        set_signaling_values['update_configuration']=request.form['update_configuration']
+        set_signaling_values['rtp_kick']= request.form['rtp_kick']
+        set_signaling_values['cdm_pubsub_1'] =request.form['cdm_pubsub_1']
+        set_signaling_values['cdm_pubsub_2']= request.form['cdm_pubsub_2']
+        set_signaling_values['cdm_pubsub_3']=request.form['cdm_pubsub_3']
+        set_signaling_values['cdm_ondemand_desires']=request.form['cdm_ondemand_desires']
+        set_signaling_values['start_tunnel_1']= request.form['start_tunnel_1']
+        set_signaling_values['start_tunnel_2']= request.form['start_tunnel_2']
+        set_signaling_values['start_tunnel_3']= request.form['start_tunnel_3']
+        set_signaling_values['start_tunnel_4']= request.form['start_tunnel_4']
+        set_signaling_values['echo']=request.form['echo']
+        set_signaling_values['device_configuration']=request.form['device_configuration']
+        set_signaling_values['fw_update']=request.form['fw_update']
+        set_signaling_values['registration_subscription']= request.form['registration_subscription']
+        set_signaling_values['cdm_pubsub_4']= request.form['cdm_pubsub_4']
         popup_script = """
         <script>
         alert('Set application flag submitted successfully!');
         window.location.href = '/';
         </script>
         """
-        return popup_script 
+        return popup_script
 
 @app.route('/reset_signaling_data', methods=['POST'])
 def reset_signaling_data():
