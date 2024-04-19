@@ -61,18 +61,22 @@ BinaryValues={
 }
 
 set_signaling_values = {
+'update_configuration': 0,
+'instant_Ink_Kick':0,
+'rtp_kick': 0,
+'cdm_pubsub_1':0,
+'cdm_pubsub_2': 0,
+'cdm_pubsub_3': 0,
+'cdm_ondemand_desires':0,
 'start_tunnel_1': 0,
 'start_tunnel_2': 0,
 'start_tunnel_3':0,
-'start_tunnel_4':0,
-'echo':0,
-'rtp_kick':0,
-'registration_subscription':0,
-'cdm_pubsub_1':0,
-'cdm_pubsub_2':0,
-'cdm_pubsub_3':0,
-'connectivityConfig':0,
-'device_configuration':0,
+'start_tunnel_4': 0,
+'echo': 1,
+'device_configuration': 0,
+'fw_update': 0,
+'registration_subscription': 0,
+'cdm_pubsub_4': 0,
 }
 
 class Version():
