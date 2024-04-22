@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Configuration</title>
+    <title>Set signaling</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,13 +24,13 @@
             background-color: #0056b3; 
             color: #fff; 
         }
-        h2{
-            color:#007bff;
+        h2 {
+            color: #007bff;
             text-align: center;
         }
         .container {
-            width: 50%;
-            margin: 50px auto;
+            width: 40%; /* Reduced width */
+            margin: 50px auto; /* Center alignment */
             padding: 20px;
             background-color: #ffffff; 
             border-radius: 5px;
@@ -48,10 +48,11 @@
         label {
             display: block;
             margin-bottom: 10px;
-            color: #007bff; 
+            /* color: #007bff; Changed label color */
         }
-        input[type="text"] {
-            width: 100%;
+        input[type="checkbox"],
+        input[type="submit"] {
+            width: calc(100% - 20px); /* Adjusted width */
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ced4da; 
@@ -59,16 +60,50 @@
             box-sizing: border-box;
             transition: border-color 0.3s;
         }
-        input[type="text"]:focus {
+        input[type="checkbox"]:focus,
+        input[type="submit"]:focus {
             border-color: #007bff; 
         }
+        input[type="checkbox"] {
+            display: none;
+        }
+        label.checkbox-label {
+            position: relative;
+            padding-left: 30px;
+            cursor: pointer;
+        }
+        label.checkbox-label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 1px solid #007bff;
+            border-radius: 3px;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
+        }
+        input[type="checkbox"]:checked + label.checkbox-label:before {
+            background-color: #007bff;
+        }
+        label.checkbox-label:after {
+            content: '\2713';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            font-size: 16px;
+            color: #fff;
+            display: none;
+        }
+        input[type="checkbox"]:checked + label.checkbox-label:after {
+            display: block;
+        }
         input[type="submit"] {
-            width: 100%;
-            padding: 10px;
             background-color: #007bff; 
             color: #fff; 
             border: none;
-            border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
         }
@@ -83,218 +118,49 @@
         <form id="update_config_form" action="/set_signaling_data" method="post">
             <h2>Set Application Flag</h2>
             <br/>
-            <label for="update_configuration">Update Configuration</label>
-            <input type="text" id="update_configuration" name="update_configuration" >
-            
-            <label for="instant_Ink_Kick">Instant Ink Kick:</label>
-            <input type="text" id="instant_Ink_Kick" name="instant_Ink_Kick" >
-            
-            <label for="rtp_kick">RTP Kick:</label>
-            <input type="text" id="rtp_kick" name="rtp_kick" >
 
-            <label for="cdm_pubsub_1">CDM PubSub 1:</label>
-            <input type="text" id="cdm_pubsub_1" name="cdm_pubsub_1" >
-
-            <label for="cdm_pubsub_2">CDM PubSub 2:</label>
-            <input type="text" id="cdm_pubsub_2" name="cdm_pubsub_2" >
-
-            <label for="cdm_pubsub_3">CDM PubSub 3:</label>
-            <input type="text" id="cdm_pubsub_3" name="cdm_pubsub_3" >
-
-            <label for="cdm_ondemand_desires">CDM OnDemand Desires:</label>
-            <input type="text" id="cdm_ondemand_desires" name="cdm_ondemand_desires" required>
-
-            <label for="start_tunnel_1">Start Tunnel 1:</label>
-            <input type="text" id="start_tunnel_1" name="start_tunnel_1" >
-
-            <label for="start_tunnel_2">Start Tunnel 2:</label>
-            <input type="text" id="start_tunnel_2" name="start_tunnel_2" >
-
-            <label for="start_tunnel_3">Start Tunnel 3:</label>
-            <input type="text" id="start_tunnel_3" name="start_tunnel_3" >
-
-            <label for="start_tunnel_4">Start Tunnel 4:</label>
-            <input type="text" id="start_tunnel_4" name="start_tunnel_4" >
-
-            <label for="echo">Echo:</label>
-            <input type="text" id="echo" name="echo" >
-
-            <label for="device_configuration">Device Config:</label>
-            <input type="text" id="device_configuration" name="device_configuration" >
-            
-            <label for="fw_update">FW Update</label>
-            <input type="text" id="fw_update" name="fw_update" required>
-
-            <label for="registration_subscription">Registration Subscription:</label>
-            <input type="text" id="registration_subscription" name="registration_subscription" >
-
-            <label for="cdm_pubsub_4">CDM PubSub 4:</label>
-            <input type="text" id="cdm_pubsub_4" name="cdm_pubsub_4" >
-
+            <input type="checkbox" id="start_tunnel_1" name="start_tunnel_1" >
+            <label class="checkbox-label" for="start_tunnel_1">Start Tunnel 1</label>
+        
+            <input type="checkbox" id="start_tunnel_2" name="start_tunnel_2" >
+            <label class="checkbox-label" for="start_tunnel_2">Start Tunnel 2</label>
+        
+            <input type="checkbox" id="start_tunnel_3" name="start_tunnel_3" >
+            <label class="checkbox-label" for="start_tunnel_3">Start Tunnel 3</label>
+        
+            <input type="checkbox" id="start_tunnel_4" name="start_tunnel_4" >
+            <label class="checkbox-label" for="start_tunnel_4">Start Tunnel 4</label>
+        
+            <input type="checkbox" id="echo" name="echo" >
+            <label class="checkbox-label" for="echo">Echo</label>
+        
+            <input type="checkbox" id="rtp_kick" name="rtp_kick" >
+            <label class="checkbox-label" for="rtp_kick">RTP Kick</label>
+        
+            <input type="checkbox" id="fw_update" name="fw_update" >
+            <label class="checkbox-label" for="fw_update">FW Update</label>
+        
+            <input type="checkbox" id="registration_subscription" name="registration_subscription">
+            <label class="checkbox-label" for="registration_subscription">Registration Subscription</label>
+        
+            <input type="checkbox" id="cdm_pubsub_1" name="cdm_pubsub_1">
+            <label class="checkbox-label" for="cdm_pubsub_1">CDM PubSub 1</label>
+        
+            <input type="checkbox" id="cdm_pubsub_2" name="cdm_pubsub_2" >
+            <label class="checkbox-label" for="cdm_pubsub_2">CDM PubSub 2</label>
+        
+            <input type="checkbox" id="cdm_pubsub_3" name="cdm_pubsub_3">
+            <label class="checkbox-label" for="cdm_pubsub_3">CDM PubSub 3</label>
+        
+            <input type="checkbox" id="connectivity_configuration" name="connectivity_configuration" >
+            <label class="checkbox-label" for="connectivity_configuration">Connectivity Configuration</label>
+        
+            <input type="checkbox" id="device_configuration" name="device_configuration" >
+            <label class="checkbox-label" for="device_configuration">Device Configuration</label>
+        
             <input type="submit" value="Submit">
-        </form>
+        </form>        
     </div>
-    <script>
-        document.getElementById("update_configuration").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Update config is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-    });
-
-    document.getElementById("instant_Ink_Kick").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Instant Ink kick is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("rtp_kick").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Rtp kick is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("cdm_pubsub_1").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("cdm pub sub 1 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("cdm_pubsub_2").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("cdm pub sub 2 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("cdm_pubsub_3").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("cdm pub sub 3 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("cdm_ondemand_desires").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Cdm onDemand desires is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("start_tunnel_1").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Start tunnel 1 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("start_tunnel_2").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Start tunnel 2 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("start_tunnel_3").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Start tunnel 3 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("start_tunnel_4").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Start tunnel 4 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("echo").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Echo is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("device_configuration").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Device config is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("fw_update").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Fw Update is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("registration_subscription").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("registration Subscription is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    document.getElementById("cdm_pubsub_4").addEventListener("input", function(event) {
-        var inputValue = event.target.value.trim();
-        var validValues = ['0', '1'];
-        if (!validValues.includes(inputValue)) {
-            event.target.setCustomValidity("Cdm pub sub 4 is either 0 or 1");
-        } else {
-            event.target.setCustomValidity("");
-        }
-        
-    });
-    </script>
+ 
 </body>
 </html>
