@@ -235,10 +235,10 @@ class SignalingData:
     
     def collectionBitmap(descriptor):
        ascii=[]
-       last=125
+       last=128
        first=int(descriptor/8)-1
        byte=int(descriptor%8)
-       lastvalue=125-int(descriptor/8)-2
+       lastvalue=128-int(descriptor/8)-2
        firstBool=True
        middleBool=True
        lastBool=True
