@@ -582,8 +582,7 @@ def post_json():
         else:
             return 'No data is received', 400
     elif request.method == 'GET':
-        if request.data:
-            stored_binary_data=request.data
+        if stored_binary_data:
             print(stored_binary_data)
             success_frame=SignalingData.response_packet()
             return success_frame, 200
