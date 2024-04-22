@@ -555,8 +555,7 @@ def reset_signaling_data():
     if request.method == 'POST':
         global set_signaling_values
         for name,label in request.form.items():  
-            set_signaling_values[name]=0 
-        print(set_signaling_values)     
+            set_signaling_values[name]=0      
         popup_script = """
         <script>
         alert('Reset application flag submitted successfully!');
@@ -577,13 +576,11 @@ def post_json():
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             success_frame=SignalingData.response_packet()
-            print(success_frame)
             return success_frame,200
         else:
             return 'No data is received', 400
     elif request.method == 'GET':
         if stored_binary_data:
-            print(stored_binary_data)
             success_frame=SignalingData.response_packet()
             return success_frame, 200
         else:
