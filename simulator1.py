@@ -13,7 +13,7 @@ sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
 download_data = []
 update_config_data = {}
 reset_signaling_data = {}
-stored_binary_data = b''
+stored_binary_data = b'\t@\x19\x01\x144567\x9cL\x97\x99\xeaD\x00\x00\x00\x00\x86(\x801;\xba&\x8e\x14y\x1fT\xea\x82\x92\x02P\xe0\xde\xac\xa0\x97\xb0\xc9\xc5\xd3\x06\xc3\x92)\xa7\xf9\xf5\xf4\x94W\x0b\xe5\xa2:\xa6\xd9\xa6\x0c\xac4p\xa3\xf8\x1d\xf3\x16\x9b\xa9\xf0\xf2'
 success_frame = b''
 error_frame = b''
 critical_error_frame = b''
@@ -61,22 +61,19 @@ BinaryValues={
 }
 
 set_signaling_values = {
-'update_configuration': 0,
-'instant_Ink_Kick':0,
-'rtp_kick': 0,
-'cdm_pubsub_1':0,
-'cdm_pubsub_2': 0,
-'cdm_pubsub_3': 0,
-'cdm_ondemand_desires':0,
 'start_tunnel_1': 0,
 'start_tunnel_2': 0,
 'start_tunnel_3':0,
 'start_tunnel_4': 0,
-'echo': 1,
-'device_configuration': 0,
+'echo': 0,
+'rtp_kick': 0,
 'fw_update': 0,
 'registration_subscription': 0,
-'cdm_pubsub_4': 0,
+'cdm_pubsub_1':0,
+'cdm_pubsub_2': 0,
+'cdm_pubsub_3': 0,
+'connectivity_configuration': 0,
+'device_configuration': 0,
 }
 
 class Version():
@@ -543,21 +540,8 @@ def update_config_data():
 def set_signaling_data():
     if request.method == 'POST':
         global set_signaling_values 
-        set_signaling_values['update_configuration']=request.form['update_configuration']
-        set_signaling_values['rtp_kick']= request.form['rtp_kick']
-        set_signaling_values['cdm_pubsub_1'] =request.form['cdm_pubsub_1']
-        set_signaling_values['cdm_pubsub_2']= request.form['cdm_pubsub_2']
-        set_signaling_values['cdm_pubsub_3']=request.form['cdm_pubsub_3']
-        set_signaling_values['cdm_ondemand_desires']=request.form['cdm_ondemand_desires']
-        set_signaling_values['start_tunnel_1']= request.form['start_tunnel_1']
-        set_signaling_values['start_tunnel_2']= request.form['start_tunnel_2']
-        set_signaling_values['start_tunnel_3']= request.form['start_tunnel_3']
-        set_signaling_values['start_tunnel_4']= request.form['start_tunnel_4']
-        set_signaling_values['echo']=request.form['echo']
-        set_signaling_values['device_configuration']=request.form['device_configuration']
-        set_signaling_values['fw_update']=request.form['fw_update']
-        set_signaling_values['registration_subscription']= request.form['registration_subscription']
-        set_signaling_values['cdm_pubsub_4']= request.form['cdm_pubsub_4']
+        for name,label in request.form.items():
+            set_signaling_values[name]=1
         popup_script = """
         <script>
         alert('Set application flag submitted successfully!');
@@ -569,26 +553,10 @@ def set_signaling_data():
 @app.route('/reset_signaling_data', methods=['POST'])
 def reset_signaling_data():
     if request.method == 'POST':
-        global reset_signaling_data
-        reset_signaling_data = {
-            'update_configuration': request.form['update_configuration'],
-            'start_tunnel_1': request.form['start_tunnel_1'],
-            'start_tunnel_2': request.form['start_tunnel_2'],
-            'start_tunnel_3': request.form['start_tunnel_3'],
-            'start_tunnel_4': request.form['start_tunnel_4'],
-            'metrics_push': request.form['metrics_push'],
-            'device_configuration': request.form['device_configuration'],
-            'echo': request.form['echo'],
-            'rtp_kick': request.form['rtp_kick'],
-            'fw_update': request.form['fw_update'],
-            'registration_subscription': request.form['registration_subscription'],
-            'cdm_pubsub_1': request.form['cdm_pubsub_1'],
-            'cdm_pubsub_2': request.form['cdm_pubsub_2'],
-            'cdm_pubsub_3': request.form['cdm_pubsub_3'],
-            'cdm_pubsub_4': request.form['cdm_pubsub_4'],
-            'cdm_ondemand_desires': request.form['cdm_ondemand_desires']
-        }
-
+        global set_signaling_values
+        for name,label in request.form.items():  
+            set_signaling_values[name]=0 
+        print(set_signaling_values)     
         popup_script = """
         <script>
         alert('Reset application flag submitted successfully!');
@@ -614,8 +582,10 @@ def post_json():
         else:
             return 'No data is received', 400
     elif request.method == 'GET':
-        if stored_binary_data:
-            # success_frame=SignalingData.response_packet()
+        if request.data:
+            stored_binary_data=request.data
+            print(stored_binary_data)
+            success_frame=SignalingData.response_packet()
             return success_frame, 200
         else:
             return error_frame,400
