@@ -76,6 +76,22 @@ set_signaling_values = {
 'device_configuration': 0,
 }
 
+Signaling_variables ={
+'Start Tunnel 1':0,
+'Start Tunnel 2':0,
+'Start Tunnel 3':0,
+'Start Tunnel 4':0,
+'Echo ':0,
+'Rtp Kick ':0,
+'Fw Update ':0,
+'Registration Subscription ':0,
+'Cdm Pub Sub 1':0,
+'Cdm Pub Sub 2':0,
+'Cdm Pub Sub 3':0,
+'Connectivity Configuration ':0,
+'Device Configuration ':0,
+}
+
 class Version():
     major=SUPPORTED_MAJOR_VERSION
     minor=SUPPORTED_MINOR_VERSION
@@ -480,7 +496,8 @@ def set_a_signal():
 
 @app.route('/reset_a_signal',methods = ['GET'])
 def reset_a_signal():
-    return render_template('ResetSignal.html')
+    zipped_values = zip(set_signaling_values.items(), Signaling_variables.items())
+    return render_template('ResetSignal.html',zipped_values=zipped_values)
 
 @app.route('/update_configuration',methods = ['GET'])
 def update_configuration():
