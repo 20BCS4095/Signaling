@@ -115,52 +115,15 @@
 <body>
     <h1>Reset Signaling</h1>
     <div class="container">
-        <form id="update_config_form" action="/reset_signaling_data" method="post">
-            <h2>Reset Application Flag</h2>
-            <br/>
-
-            <input type="radio" id="start_tunnel_1" name="start_tunnel_1" value="1">
-            <label class="radio-label" for="start_tunnel_1">Start Tunnel 1</label>
-        
-            <input type="radio" id="start_tunnel_2" name="start_tunnel_2" value="2">
-            <label class="radio-label" for="start_tunnel_2">Start Tunnel 2</label>
-        
-            <input type="radio" id="start_tunnel_3" name="start_tunnel_3" value="3">
-            <label class="radio-label" for="start_tunnel_3">Start Tunnel 3</label>
-        
-            <input type="radio" id="start_tunnel_4" name="start_tunnel_4" value="4">
-            <label class="radio-label" for="start_tunnel_4">Start Tunnel 4</label>
-        
-            <input type="radio" id="echo" name="echo" value="echo">
-            <label class="radio-label" for="echo">Echo</label>
-        
-            <input type="radio" id="rtp_kick" name="rtp_kick" value="rtp_kick">
-            <label class="radio-label" for="rtp_kick">RTP Kick</label>
-        
-            <input type="radio" id="fw_update" name="fw_update" value="fw_update">
-            <label class="radio-label" for="fw_update">FW Update</label>
-        
-            <input type="radio" id="registration_subscription" name="registration_subscription" value="registration_subscription">
-            <label class="radio-label" for="registration_subscription">Registration Subscription</label>
-        
-            <input type="radio" id="cdm_pubsub_1" name="cdm_pubsub_1" value="1">
-            <label class="radio-label" for="cdm_pubsub_1">CDM PubSub 1</label>
-        
-            <input type="radio" id="cdm_pubsub_2" name="cdm_pubsub_2" value="2">
-            <label class="radio-label" for="cdm_pubsub_2">CDM PubSub 2</label>
-        
-            <input type="radio" id="cdm_pubsub_3" name="cdm_pubsub_3" value="3">
-            <label class="radio-label" for="cdm_pubsub_3">CDM PubSub 3</label>
-        
-            <input type="radio" id="connectivity_configuration" name="connectivity_configuration" value="connectivity_configuration">
-            <label class="radio-label" for="connectivity_configuration">Connectivity Configuration</label>
-        
-            <input type="radio" id="device_configuration" name="device_configuration" value="device_configuration">
-            <label class="radio-label" for="device_configuration">Device Configuration</label>
-        
-            <input type="submit" value="Submit">
-        </form>        
+    <form id="update_config_form"action="/reset_signaling_data" method="post">
+        <h2>Reset Application Flag</h2>
+        <br/>
+        {% for (key1, value1),(key2,value2) in zipped_values %}
+            <input type="radio" name="{{key1}}" value="{{ value1 }}" {% if value1 == 1 %} checked {% endif %}>
+            <label class="radio-label">{{key2}}</label>
+        {% endfor %}
+        <input type="submit" value="Submit">
+    </form>
     </div>
- 
 </body>
 </html>
