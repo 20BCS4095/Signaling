@@ -259,8 +259,8 @@ class SignalingData:
        middleBool=True
        lastBool=True
        while last>0:
-        if descriptor%8==0:
-            first-=1
+        # if descriptor%8==0:
+        #     first-=1
         if firstBool:
             if first>=0 and first<64:
                 ascii.append(first)
