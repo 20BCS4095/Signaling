@@ -276,9 +276,7 @@ class SignalingData:
                 last -=1
                 ascii.append(128)
                 msb_position = byte
-                if byte==0:
-                  msb_position=8
-                value = 1 << (7 - (msb_position - 1))
+                value = 1 << msb_position
                 ascii.append(value)
             middleBool=False
             lastBool=True
