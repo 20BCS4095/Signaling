@@ -415,6 +415,7 @@ class SignalingData:
             encrypted_values.append(int(y,16))
         #---------------------------Collection Content-------------------#
         a=[]
+        print(a)
         a=SignalingData.collectionBitmap(int(Values['Descriptor']))
         if len(a)>5:
            encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
