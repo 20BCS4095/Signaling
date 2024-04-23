@@ -490,41 +490,10 @@ def home_page():
 def set_a_signal():
     return render_template('SetSignal.html')
 
-# @app.route('/reset_a_signal',methods = ['GET'])
-# def reset_a_signal():
-#     zipped_values = zip(set_signaling_values.items(), Signaling_variables.items())
-#     return render_template('ResetSignal.html',zipped_values=zipped_values)
-
 @app.route('/reset_a_signal',methods = ['GET'])
 def reset_a_signal():
-    answer="You can reset the bit for the following Service "
-    answer1="You can't reset the bit for the service "
-    setBit=True
-    resetBit=True
-    hex_bytes=Values['AppFlagAsk']
-    reversed_bytes = hex_bytes[::-1]
-    binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
-    binary_array1 = []
-    for bit in binary_string:
-        binary_array1.append(int(bit))
-    for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
-        if appAck1==1 and set_signaling_values[appState]==1:
-            answer+=appState+" "
-            setBit=False
-        elif appAck1==0 and set_signaling_values[appState]==1 or appAck1==0 and set_signaling_values[appState]==2:
-            set_signaling_values[appState]=2
-            answer1+=appState+" "
-            resetBit=False
-        elif appAck1==1 and set_signaling_values[appState]==2:
-            set_signaling_values[appState]=1
-    if setBit:
-        answer=""
-    if resetBit:
-        answer1=""
-    else:
-        answer1+=" until the printer acknowledge"
     zipped_values = zip(set_signaling_values.items(), Signaling_variables.items())
-    return render_template('ResetSignal.html',zipped_values=zipped_values,answer=answer,answer1=answer1)
+    return render_template('ResetSignal.html',zipped_values=zipped_values)
 
 @app.route('/update_configuration',methods = ['GET'])
 def update_configuration():
@@ -617,15 +586,15 @@ def post_json():
             key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
-            # hex_bytes=Values['AppFlagAsk']
-            # reversed_bytes = hex_bytes[::-1]
-            # binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
-            # binary_array1 = []
-            # for bit in binary_string:
-            #     binary_array1.append(int(bit))
-            # for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
-            #   if appAck1==1 and set_signaling_values[appState]==1:
-            #       set_signaling_values[appState]=0
+            hex_bytes=Values['AppFlagAsk']
+            reversed_bytes = hex_bytes[::-1]
+            binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
+            binary_array1 = []
+            for bit in binary_string:
+                binary_array1.append(int(bit))
+            for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
+              if appAck1==1 and set_signaling_values[appState]==1:
+                  set_signaling_values[appState]=0
             success_frame=SignalingData.response_packet()
             return success_frame,200
         else:
