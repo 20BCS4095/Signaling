@@ -511,10 +511,6 @@ def view_metrics():
 def duration_test():
     return render_template('DurationTest.html')
 
-@app.route('/packet_decoder',methods = ['GET'])
-def packet_decoder():
-    return render_template('PacketDecoder.html')
-
 @app.route('/get_data')
 def get_data():
 
