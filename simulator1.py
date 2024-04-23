@@ -593,7 +593,7 @@ def post_json():
             for bit in binary_string:
                 binary_array1.append(int(bit))
             for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
-              if appAck1=='1' and set_signaling_values[appState]=='1':
+              if appAck1==1 and set_signaling_values[appState]==1:
                   set_signaling_values[appState]=0
             print(set_signaling_values)
             success_frame=SignalingData.response_packet()
