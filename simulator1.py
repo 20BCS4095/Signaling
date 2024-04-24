@@ -628,7 +628,7 @@ def get_json():
     if stored_binary_data:
         request_value = [char for char in stored_binary_data]
         request_data = ' '.join(map(str, request_value))
-        return render_template('index.html', data=request_data, binary_data=stored_binary_data, data1=Values)
+        return render_template('index.html', data=request_data, binary_data=stored_binary_data, data1=Values, set_signaling_values=set_signaling_values)
     else:
         return 'No binary data stored', 404
 
