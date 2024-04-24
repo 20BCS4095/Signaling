@@ -493,6 +493,7 @@ class SignalingData:
         key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
         result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
         de=SignalingData.aes_gcm_decrypt(key,nonce,result[0],result[1],aad)
+        print(de)
         stored_binary= bytes(aad+result[0]+bytes([SignalingData.encode_tlv(Variable.EnhanceGcm,GCM_TAG_LEN)])+bytes([len(result[1])])+result[1])
         return stored_binary
     
@@ -606,7 +607,6 @@ def post_json():
                 for key, value in set_signaling_values.items():
                     if value==1:
                         set_signaling_values[key]=0
-            print(set_signaling_values)
             return success_frame,200
         else:
             return 'No data is received', 400
