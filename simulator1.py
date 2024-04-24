@@ -428,7 +428,6 @@ class SignalingData:
         #---------------------------Collection Content-------------------#
         a=[]
         a=SignalingData.collectionBitmap(int(Values['Descriptor']))
-        print(a)
         if len(a)>5:
            encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
            encrypted_values.append(len(a))
@@ -586,6 +585,7 @@ def post_json():
             key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
+            print(Values['AppFlagAsk'],set_signaling_values)
             hex_bytes=Values['AppFlagAsk']
             reversed_bytes = hex_bytes[::-1]
             binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
@@ -595,6 +595,7 @@ def post_json():
             for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
               if appAck1==1 and set_signaling_values[appState]==1:
                   set_signaling_values[appState]=0
+            print(set_signaling_values)
             success_frame=SignalingData.response_packet()
             return success_frame,200
         else:
