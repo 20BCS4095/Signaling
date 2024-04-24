@@ -599,6 +599,9 @@ def post_json():
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             SignalingData.resetAppBitAfterAppFlagAck()
             success_frame=SignalingData.response_packet()
+            if Values['Descriptor']=='0':
+                set_signaling_values=0
+            print(set_signaling_values)
             return success_frame,200
         else:
             return 'No data is received', 400
