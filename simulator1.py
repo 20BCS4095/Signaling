@@ -440,10 +440,9 @@ class SignalingData:
         #---------------------------Collection Content-------------------#
         a=[]
         if Values['Descriptor']=='-1':
-            a=[0,0,0,0,0]
+            a=[192,0,127]
         else:
             a=SignalingData.collectionBitmap(int(Values['Descriptor']))
-        print(a)
         if len(a)>5:
            encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
            encrypted_values.append(len(a))
@@ -494,7 +493,6 @@ class SignalingData:
         key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
         result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
         de=SignalingData.aes_gcm_decrypt(key,nonce,result[0],result[1],aad)
-        print(de)
         stored_binary= bytes(aad+result[0]+bytes([SignalingData.encode_tlv(Variable.EnhanceGcm,GCM_TAG_LEN)])+bytes([len(result[1])])+result[1])
         return stored_binary
     
