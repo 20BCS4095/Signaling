@@ -30,9 +30,15 @@
     <pre>{{data1.Descriptor}}</pre>
     <h2>App Flag Ack </h2>
     <pre>{{data1.AppFlagAsk}}</pre>
+    {% for key, value in set_signaling_values.items() %}
+            {% if value == 1 %}
+                <pre>Set bit -> {{ key }}</pre>
+            {% endif %}
+    {% endfor %}
+    <h2>App Flag Ack </h2>
+    <pre>{{data1.AppFlagAsk}}</pre>
     {% if data1.AppFlagAskSignal %}
-    <h2>Ack bit form printer to reset the bit</h2>
-    <pre>{{ data1.AppFlagAskSignal }}</pre>
+    <pre>Reset bit -> {{ data1.AppFlagAskSignal }} </pre>
     {% endif %}
     <h2>Printer Status </h2>
     <pre>{{data1.PrinterStatus}}</pre>
