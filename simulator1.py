@@ -251,6 +251,7 @@ class SignalingData:
         return first_eight_hex,rest_hex
         
     def resetAppBitAfterAppFlagAck():
+        n=0
         hex_bytes=Values['AppFlagAsk']
         reversed_bytes = hex_bytes[::-1]
         binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
@@ -260,10 +261,11 @@ class SignalingData:
         for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
             if appAck1==1 and set_signaling_values[appState]==1:
               Values['AppFlagAskSignal']+=appState+" "
+              n=1
               # set_signaling_values[appState]=0
               Values['Descriptor']='-1'
-            else:
-                Values['AppFlagAskSignal']=''
+        if n==0:
+            Values['AppFlagAskSignal']=''
         print(Values['AppFlagAskSignal'])
         
     def collectionBitmap(descriptor):
