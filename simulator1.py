@@ -248,7 +248,18 @@ class SignalingData:
         first_eight_hex = hex(first_eight_int)
         rest_hex = hex(rest_int)
         return first_eight_hex,rest_hex
-    
+        
+    def resetAppBitAfterAppFlagAck():
+        hex_bytes=Values['AppFlagAsk']
+        reversed_bytes = hex_bytes[::-1]
+        binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
+        binary_array1 = []
+        for bit in binary_string:
+            binary_array1.append(int(bit))
+        for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
+            if appAck1==1 and set_signaling_values[appState]==1:
+              set_signaling_values[appState]=0
+                
     def collectionBitmap(descriptor):
        ascii=[]
        last=128
@@ -585,15 +596,8 @@ def post_json():
             key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
-            hex_bytes=Values['AppFlagAsk']
-            reversed_bytes = hex_bytes[::-1]
-            binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
-            binary_array1 = []
-            for bit in binary_string:
-                binary_array1.append(int(bit))
-            for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
-              if appAck1==1 and set_signaling_values[appState]==1:
-                  set_signaling_values[appState]=0
+            SignalingData.resetAppBitAfterAppFlagAck()
+            print(set_signaling_values)
             success_frame=SignalingData.response_packet()
             return success_frame,200
         else:
