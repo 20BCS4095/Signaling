@@ -259,7 +259,7 @@ class SignalingData:
         for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
             if appAck1==1 and set_signaling_values[appState]==1:
               # set_signaling_values[appState]=0
-              Values['Descriptor']='0'
+              Values['Descriptor']='-1'
                 
     def collectionBitmap(descriptor):
        ascii=[]
@@ -439,7 +439,10 @@ class SignalingData:
             encrypted_values.append(int(y,16))
         #---------------------------Collection Content-------------------#
         a=[]
-        a=SignalingData.collectionBitmap(int(Values['Descriptor']))
+        if Values['Descriptor']=='-1':
+            a=[0,0,0,0,0]
+        else:
+            a=SignalingData.collectionBitmap(int(Values['Descriptor']))
         if len(a)>5:
            encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
            encrypted_values.append(len(a))
@@ -599,7 +602,7 @@ def post_json():
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             SignalingData.resetAppBitAfterAppFlagAck()
             success_frame=SignalingData.response_packet()
-            if Values['Descriptor']=='0':
+            if Values['Descriptor']=='-1':
                 for key, value in set_signaling_values.items():
                     if value==1:
                         set_signaling_values[key]=0
