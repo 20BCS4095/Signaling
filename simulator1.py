@@ -258,7 +258,7 @@ class SignalingData:
             binary_array1.append(int(bit))
         for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
             if appAck1==1 and set_signaling_values[appState]==1:
-              set_signaling_values[appState]=0
+              # set_signaling_values[appState]=0
               Values['Descriptor']='0'
                 
     def collectionBitmap(descriptor):
