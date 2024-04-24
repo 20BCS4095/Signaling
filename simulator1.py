@@ -600,7 +600,9 @@ def post_json():
             SignalingData.resetAppBitAfterAppFlagAck()
             success_frame=SignalingData.response_packet()
             if Values['Descriptor']=='0':
-                set_signaling_values=0
+                for key, value in set_signaling_values.items():
+                    if value==1:
+                        set_signaling_values[key]=0
             print(set_signaling_values)
             return success_frame,200
         else:
