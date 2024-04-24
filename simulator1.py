@@ -597,7 +597,6 @@ def post_json():
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             SignalingData.resetAppBitAfterAppFlagAck()
-            print(set_signaling_values)
             success_frame=SignalingData.response_packet()
             return success_frame,200
         else:
