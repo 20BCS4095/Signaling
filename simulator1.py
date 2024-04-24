@@ -266,7 +266,6 @@ class SignalingData:
               Values['Descriptor']='-1'
         if n==0:
             Values['AppFlagAskSignal']=''
-        print(Values['AppFlagAskSignal'])
         
     def collectionBitmap(descriptor):
        ascii=[]
