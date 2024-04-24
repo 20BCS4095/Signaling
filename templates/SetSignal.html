@@ -161,6 +161,16 @@
             <input type="submit" value="Submit">
         </form>        
     </div>
- 
+    <script>
+        var radioButtons = document.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(function(radioButton) {
+            radioButton.addEventListener('click', function() {
+                radioButtons.forEach(function(radio) {
+                    radio.checked = false;
+                });
+                this.checked = true;
+            });
+        });
+    </script>
 </body>
 </html>
