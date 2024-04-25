@@ -335,7 +335,7 @@ class SignalingData:
              output[b]=(int('0',2))
            a=a-1
            b=b+1
-        a=4
+        a=5
         for key, values in list(binary_array1.items())[8:]:
            if values ==1 and a>=0:
             output[b]=(int(binary[0:a]+'1'+binary[a:5],2))
