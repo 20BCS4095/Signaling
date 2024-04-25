@@ -480,6 +480,7 @@ class SignalingData:
                 encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,1))
                 encrypted_values.append(output[key])
                 m=SignalingData.setCollectionContent(key,value)
+                print(m)
                 if m==0:
                   a=[192,0,127]
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
