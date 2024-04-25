@@ -599,6 +599,7 @@ class SignalingData:
         result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
         de=SignalingData.aes_gcm_decrypt(key,nonce,result[0],result[1],aad)
         stored_binary= bytes(aad+result[0]+bytes([SignalingData.encode_tlv(Variable.EnhanceGcm,GCM_TAG_LEN)])+bytes([len(result[1])])+result[1])
+        request_value = [char for char in stored_binary]
         for value in request_value:
            logging.info(f'{value}')
         return stored_binary
