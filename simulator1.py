@@ -377,13 +377,13 @@ class SignalingData:
             elif Variable(var_name).name == "Command":
                 index+=1
                 Values['Command']=stored_binary_data[index]
-                logging.info(f'Signaling :: Command value {Values['Command']}')
+                logging.info(f'Signaling :: Command value {Values["Command"]}')
                 if Values['Command'] == 1:
-                  logging.info(f'Signaling :: Command data {Commands.GetCollection}')
+                  logging.info(f'Signaling :: Command data {Commands.GetCollection}\n')
                 elif Values['Command'] == 0:
-                  logging.info(f'Signaling :: Command data {Commands.Reserved}')
+                  logging.info(f'Signaling :: Command data {Commands.Reserved}\n')
                 elif Values['Command'] == 2:
-                  logging.info(f'Signaling :: Command data {Commands.ChangePollingFreq}')
+                  logging.info(f'Signaling :: Command data {Commands.ChangePollingFreq}\n')
                 else:
                   logging.info(f'Signaling :: Command data {Commands.ChangeRetryGraceCnt}\n')            
 
@@ -397,7 +397,7 @@ class SignalingData:
                     ascii_list.append(stored_binary_data[index])
                 Values['CollectionId']=''.join(chr(key) for key in ascii_list)
                 logging.info('Signaling :: Parse case collection id')
-                logging.info(f'Signaling :: CollectionId received data {Values['CollectionId']} and length {len(Values['CollectionId'])}\n')
+                logging.info(f'Signaling :: CollectionId received data {Values["CollectionId"]} and length {len(Values["CollectionId"])}\n')
 
             elif Variable(var_name).name == "Nonce":
                 i=index+length
@@ -409,7 +409,7 @@ class SignalingData:
                    ascii_list.append(str(stored_binary_data[index]))
                 Values['Nonce']=' '.join(key for key in ascii_list)
                 logging.info('Signaling :: Parse case nonce')
-                logging.info(f'Signaling :: Nonce received data {Values['Nonce']} and length {len(ascii_list)}\n')
+                logging.info(f'Signaling :: Nonce received data {Values["Nonce"]} and length {len(ascii_list)}\n')
 
             elif Variable(var_name).name == "TimeStamp":
                i=index+length
@@ -422,7 +422,7 @@ class SignalingData:
                hex_timestamp = ''.join(map(str, ascii_list))
                Values['TimeStamp']   = hex_timestamp
                logging.info('Signaling :: Parse case TimeStamp')
-               logging.info(f'Signaling :: TimeStamp received data {Values['TimeStamp']}\n') 
+               logging.info(f'Signaling :: TimeStamp received data {Values["TimeStamp"]}\n') 
 
             elif Variable(var_name).name == "EncryptedBlock":
                 BinaryValues['aad']=stored_binary_data[0:index+1]
@@ -434,7 +434,7 @@ class SignalingData:
                   index+=1
                   ascii_list.append(stored_binary_data[index])
                 Values['EncryptedBlock']=' '.join(map(str, ascii_list))
-                logging.info(f'EncryptedBlock Value :: {Values['EncryptedBlock']}')
+                logging.info(f'EncryptedBlock Value :: {Values["EncryptedBlock"]}')
                 request_value = [char for char in BinaryValues['aad']]
                 d=0
                 for value in request_value:
@@ -451,7 +451,7 @@ class SignalingData:
                 index+=1
                 ascii_list.append(stored_binary_data[index])
                Values['EnhancedGcm']=' '.join(map(str,ascii_list))
-               logging.info(f'Signaling :: Enhance GCm {Values['EnhancedGcm']}\n')
+               logging.info(f'Signaling :: Enhance GCm {Values["EnhancedGcm"]}\n')
                request_value = [char for char in BinaryValues['tag']]
                d=0
                for value in request_value: 
@@ -466,7 +466,7 @@ class SignalingData:
                 ascii_list.append(stored_binary_data[index])
                Values['CloudPrinterId']=''.join(chr(key) for key in ascii_list)
                logging.info('Signaling :: Parse case cloudPrinterId ')
-               logging.info(f'Signaling :: CloudPrinterId received data {Values['CloudPrinterId']}\n') 
+               logging.info(f'Signaling :: CloudPrinterId received data {Values["CloudPrinterId"]}\n') 
 
             elif Variable(var_name).name == "DeviceDescriptor":
               i=index+length
@@ -474,7 +474,7 @@ class SignalingData:
               index=i
               Values['Descriptor'] = int.from_bytes(BinaryValues['Descriptor'], byteorder='big')
               logging.info('Signaling :: Parse case Descriptor')
-              logging.info(f'Signaling :: Descriptor received data {Values['Descriptor']}\n')  
+              logging.info(f'Signaling :: Descriptor received data {Values["Descriptor"]}\n')  
 
             elif Variable(var_name).name == "AppFlagsAck":
               i=index+length
@@ -487,7 +487,7 @@ class SignalingData:
               Values['PrinterStatus']=stored_binary_data[index+1:i+1]
               index=i
               logging.info('Signaling :: Parse case PrinterStatus')
-              logging.info(f'Signaling :: Printer Status received data {Values['PrinterStatus']}\n')  
+              logging.info(f'Signaling :: Printer Status received data {Values["PrinterStatus"]}\n')  
             else:
               print("Other")
             index += 1
@@ -565,7 +565,7 @@ class SignalingData:
         else:
             return "Version does not match"
         #--------------------------------Collection ID----------------------------------#
-        decimal_values.append(SignalingData.encode_tlv(Variable.CollectionId,len(Values['CollectionId'])))
+        decimal_values.append(SignalingData.encode_tlv(Variable.CollectionId,len(Values["CollectionId"])))
         decimal_values += [ord(char) for char in Values['CollectionId']]
         enhance_gcm+=[ord(char) for char in Values['CollectionId']]
         logging.info(f'Signaling :: Generate Collection ID {decimal_values}')
