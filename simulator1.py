@@ -480,7 +480,7 @@ class SignalingData:
                 encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,1))
                 encrypted_values.append(output[key])
                 m=SignalingData.setCollectionContent(key,value)
-                print(m)
+                print("Hello",m)
                 if m==0:
                   a=[192,0,127]
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
@@ -671,6 +671,7 @@ def post_json():
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
+                    print(appAsk)
             return success_frame,200
         else:
             return 'No data is received', 400
