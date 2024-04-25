@@ -9,7 +9,7 @@ import secrets
 import time
 import logging
 app = Flask(__name__)
-logging.basicConfig(filename='app.log', level=logging.INFO, format='[%(created)d] - %(message)s')
+logging.basicConfig(filename="app.log", level=logging.INFO, format='[%(created)d] - %(message)s')
 
 sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
 download_data = []
