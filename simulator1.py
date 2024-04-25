@@ -726,7 +726,6 @@ def post_json():
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
-            print(success_frame)
             return success_frame,200
         else:
             logging.info('HTTP Request fail for post')
