@@ -1,3 +1,4 @@
 Flask
 Gunicorn
 cryptography
+loguru==0.5.3
