@@ -61,6 +61,9 @@ BinaryValues={
 'IV':b''
 }
 
+AppFlagAsk={ 
+}
+
 set_signaling_values = {
 'start_tunnel_1': 0,
 'start_tunnel_2': 0,
@@ -242,30 +245,28 @@ class SignalingData:
         return bytes_data
     
     def appFlagSet():
-        first_eight_string = ''.join(str(set_signaling_values[key]) for key in reversed(list(set_signaling_values)[:8]))
-        rest_string = ''.join(str(set_signaling_values[key]) for key in reversed(list(set_signaling_values)[8:]))
-        first_eight_int = int(first_eight_string, 2)
-        rest_int = int(rest_string, 2)
-        first_eight_hex = hex(first_eight_int)
-        rest_hex = hex(rest_int)
-        return first_eight_hex,rest_hex
-        
-    def resetAppBitAfterAppFlagAck():
-        n=0
-        hex_bytes=Values['AppFlagAsk']
-        reversed_bytes = hex_bytes[::-1]
-        binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
-        binary_array1 = []
-        for bit in binary_string:
-            binary_array1.append(int(bit))
-        for appAck1,appState in  zip(reversed(list(binary_array1)),list(set_signaling_values)):
-            if appAck1==1 and set_signaling_values[appState]==1:
-              Values['AppFlagAskSignal']+=appState+" "
-              n=1
-              # set_signaling_values[appState]=0
-              Values['Descriptor']='-1'
-        if n==0:
-            Values['AppFlagAskSignal']=''
+        a=7
+        output={}
+        b=0
+        binary='00000000'
+        for key,values in list(set_signaling_values.items())[:8]:
+            if values==1 and a>=0:
+                output[b]=(int(binary[0:a]+'1'+binary[a:7],2))
+                a=a-1
+            else:
+                output[b]=(int('0',2))
+                a=a-1
+            b=b+1
+        a=4
+        for key,values in list(set_signaling_values.items())[8:]:
+            if values ==1 and a>=0:
+                output[b]=(int(binary[0:a]+'1'+binary[a:5],2))
+                a=a-1
+            else:
+               output[b]=(int('0',2))
+               a=a-1
+            b=b+1
+        return output
         
     def collectionBitmap(descriptor):
        ascii=[]
@@ -308,7 +309,44 @@ class SignalingData:
             lastBool=False
             last=0
        return ascii
-
+        
+    def setCollectionContent(key1,value):
+        hex_bytes = Values['AppFlagAsk']
+        reversed_bytes=hex_bytes[::2]
+        binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
+        reversed_binary_string = binary_string[::-1] 
+        reversed_bytes=hex_bytes[1::2]
+        binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
+        reversed_binary_string+=binary_string[::-1]
+        binary_array1 = {}
+        output={}
+        c=0
+        b=0
+        binary='00000000'
+        for bit in reversed_binary_string:
+          binary_array1[c]=(int(bit))
+          AppFlagAsk[c]=(int(bit))
+          c=c+1
+        a=7
+        for key ,values in list(binary_array1.items())[:8]:
+           if values==1 and a>=0:
+             output[b]=(int(binary[0:a]+'1'+binary[a:7],2))
+           else:
+             output[b]=(int('0',2))
+           a=a-1
+           b=b+1
+        a=4
+        for key, values in list(binary_array1.items())[8:]:
+           if values ==1 and a>=0:
+            output[b]=(int(binary[0:a]+'1'+binary[a:5],2))
+           else:
+            output[b]=(int('0',2))
+           a=a-1
+           b=b+1
+        if output[key1]==value:
+         return 0
+        else:
+         return 1
     def RequestPacketDecode(stored_binary_data):
         index=0
         while index < len(stored_binary_data):
@@ -434,30 +472,52 @@ class SignalingData:
         #----------------------------ReplyExpiration----------------------------#
         encrypted_values.append(SignalingData.encode_tlv(Variable.ReplyExpiration,1))
         encrypted_values.append(240)
-        #-------------------------------App Flag--------------------------#
-        x,y=SignalingData.appFlagSet()
-        if y=='0x0':
-           encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,1))
-           encrypted_values.append(int(x,16)) 
-        else:
-            encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,2))
-            encrypted_values.append(int(x,16))
-            encrypted_values.append(int(y,16))
-        #---------------------------Collection Content-------------------#
+        # #---------------------------App Flag and Collection Content-------------------#
         a=[]
-        if Values['Descriptor']=='-1':
-            a=[192,0,127]
-        else:
-            a=SignalingData.collectionBitmap(int(Values['Descriptor']))
-        if len(a)>5:
-           encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
-           encrypted_values.append(len(a))
-           for x in a:
-              encrypted_values.append(x)
-        else:
-           encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
-           for x in a:
-              encrypted_values.append(x)
+        output=SignalingData.appFlagSet()
+        for key ,value in list(output.items()):
+            if key<8 and value>0:
+                encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,1))
+                encrypted_values.append(output[key])
+                m=SignalingData.setCollectionContent(key,value)
+                if m==0:
+                  a=[192,0,127]
+                  encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+                  for x in a:
+                   encrypted_values.append(x)
+                else:
+                    a=SignalingData.collectionBitmap(int(Values['Descriptor']))
+                    if len(a)>5:
+                       encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+                       encrypted_values.append(len(a))
+                       for x in a:
+                        encrypted_values.append(x)
+                    else:
+                      encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+                      for x in a:
+                       encrypted_values.append(x)
+            elif key>=8 and value>0:
+                encrypted_values.append(SignalingData.encode_tlv(Variable.AppFlags,2))
+                encrypted_values.append(0)
+                encrypted_values.append(output[key])
+                m=SignalingData.setCollectionContent(key,value)
+                if m==0:
+                  a=[192,0,127]
+                  encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+                  for x in a:
+                   encrypted_values.append(x)
+                else:
+                    a=SignalingData.collectionBitmap(int(Values['Descriptor']))
+                    if len(a)>5:
+                       encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+                       encrypted_values.append(len(a))
+                       for x in a:
+                        encrypted_values.append(x)
+                    else:
+                      encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
+                      for x in a:
+                       encrypted_values.append(x)
+
         #-----------------------------Command--------------------------#
         encrypted_values.append(SignalingData.encode_tlv(Variable.Command,1))
         encrypted_values.append(int(Commands.ChangeRetryGraceCnt))
@@ -606,12 +666,10 @@ def post_json():
             key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
-            SignalingData.resetAppBitAfterAppFlagAck()
             success_frame=SignalingData.response_packet()
-            if Values['Descriptor']=='-1':
-                for key, value in set_signaling_values.items():
-                    if value==1:
-                        set_signaling_values[key]=0
+            for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
+                if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
+                    set_signaling_values[appAsk]=0
             return success_frame,200
         else:
             return 'No data is received', 400
