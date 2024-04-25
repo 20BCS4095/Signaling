@@ -312,13 +312,12 @@ class SignalingData:
         
     def setCollectionContent(key1,value):
         hex_bytes = Values['AppFlagAsk']
-        reversed_bytes=hex_bytes[::2]
+        reversed_bytes=hex_bytes[0:1:]
         binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
         reversed_binary_string = binary_string[::-1] 
-        reversed_bytes=hex_bytes[1::2]
+        reversed_bytes=hex_bytes[1:2:]
         binary_string = ''.join(format(byte, '08b') for byte in reversed_bytes)
         reversed_binary_string+=binary_string[::-1]
-        print("Re",reversed_binary_string)
         binary_array1 = {}
         output={}
         c=0
@@ -328,7 +327,6 @@ class SignalingData:
           binary_array1[c]=(int(bit))
           AppFlagAsk[c]=(int(bit))
           c=c+1
-        print(binary_array1)
         a=7
         for key ,values in list(binary_array1.items())[:8]:
            if values==1 and a>=0:
@@ -345,7 +343,6 @@ class SignalingData:
             output[b]=(int('0',2))
            a=a-1
            b=b+1
-        print("O",output)
         if output[key1]==value:
          return 0
         else:
