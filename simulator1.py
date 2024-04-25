@@ -480,7 +480,7 @@ class SignalingData:
               i=index+length
               Values['AppFlagAsk'] = stored_binary_data[index+1:i+1]
               index=i
-              logging.info(f'AppFlagAsk :: {Values['AppFlagAsk']}\n')  
+              logging.info(f'AppFlagAsk :: {Values["AppFlagAsk"]}\n')  
 
             elif Variable(var_name).name == "PrinterStatus":
               i=index+length
