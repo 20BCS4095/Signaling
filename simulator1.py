@@ -434,9 +434,11 @@ class SignalingData:
                BinaryValues['TimeStamp']=stored_binary_data[index+1:i+1]
                while index<i:
                 index+=1
-                ascii_list.append(stored_binary_data[index])
+                ascii_list.append(hex(stored_binary_data[index]))
                hex_timestamp = ''.join(map(str, ascii_list))
-               Values['TimeStamp']   = hex_timestamp
+               current_time = int(hex_timestamp, 16)
+               human_readable_time = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
+               Values['TimeStamp']   = human_readable_time
                logging.info('Signaling :: Parse case TimeStamp')
                logging.info(f'Signaling :: TimeStamp received data {Values["TimeStamp"]}\n') 
 
