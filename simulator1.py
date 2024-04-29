@@ -658,7 +658,7 @@ def view_metrics():
     else:
         signal=0
     print(signal)
-    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal)
+    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=Values)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
