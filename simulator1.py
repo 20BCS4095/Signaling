@@ -26,6 +26,8 @@ stored_binary =b''
 aad=b''
 nonce=b''
 plaintext=b''
+signaling_set_by_server=0
+signaling_ack_by_server=0
 HEADER_MASK = 0xF8
 HEADER_LEN_MASK = 0x07
 TLV_BIG = 0x06
@@ -508,6 +510,7 @@ class SignalingData:
         return Values
 
     def response_packet():
+        global signaling_ack_by_server
         index=0
         decimal_values=[]
         encrypted_values=[]
@@ -528,6 +531,7 @@ class SignalingData:
                 m=SignalingData.setCollectionContent(key,value)
                 if m==0:
                   a=[192,0,127]
+                  signaling_ack_by_server=signaling_ack_by_server+1
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
@@ -691,9 +695,11 @@ def update_config_data():
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
     if request.method == 'POST':
+        global signaling_set_by_server
         global set_signaling_values 
         for name,label in request.form.items():
             set_signaling_values[name]=1
+            signaling_set_by_server=signaling_set_by_server+1
         popup_script = """
         <script>
         alert('Set application flag submitted successfully!');
