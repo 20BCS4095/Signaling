@@ -12,8 +12,8 @@ import logging
 app = Flask(__name__)
 name_file="app.log"
 logging.basicConfig(filename=name_file, level=logging.INFO, format="[%(created)d] - %(message)s")
-last_request_time = time.time()
-printer_status="Online Line"
+last_request_time = 0
+printer_status="Not started to polling"
 sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
 download_data = []
 update_config_data = {}
@@ -105,6 +105,7 @@ def check_printer_status():
     global last_request_time
     global printer_status
     while True:
+        print(time.time()-last_request_time)
         if time.time() - last_request_time > 10:
             logging.info("Printer is offline")
             printer_status="Printer is offline"
