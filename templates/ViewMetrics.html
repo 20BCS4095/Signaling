@@ -131,15 +131,8 @@
                 <div class="collapse" id="signalSetByServer">
                     <div class="card">
                         <div class="card-body">
-                            {% if data %}
-                                <ul>
-                                    {% for item in data %}
-                                        <li>{{ item }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p>No data available</p>
-                            {% endif %}
+                            <li>Set -> {{signal_set}}</li>
+                            <li>Ack -> {{signal_ack}}</li>
                         </div>
                     </div>
                 </div>
@@ -213,26 +206,6 @@
             </div>
         </div>
     </div>
-    <!-- <h2>Download Metrics Collection</h2>
-    <button id="downloadButton">Download</button>
-
-    <script>
-        document.getElementById('downloadButton').addEventListener('click', function() {
-            fetch('/get_data')
-                .then(response => response.json())
-                .then(data => {
-                    const jsonData = JSON.stringify(data);
-                    const blob = new Blob([jsonData], { type: 'application/json' });
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = 'data.json';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                })
-                .catch(error => console.error('Error:', error));
-        });
-    </script> -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
