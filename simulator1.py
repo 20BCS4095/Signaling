@@ -648,8 +648,8 @@ def view_metrics():
     epoch_time=last_request_time
     normal_time = datetime.datetime.utcfromtimestamp(epoch_time)
     m=normal_time.strftime('%Y-%m-%d %H:%M:%S')
-    signal=((signaling_ack_by_server/signaling_set_by_server)*100)
-    print(signal)
+    # signal=((signaling_ack_by_server/signaling_set_by_server)*100)
+    # print(signal)
     return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server)
 
 @app.route('/duration_test',methods = ['GET'])
