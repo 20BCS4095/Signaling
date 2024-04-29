@@ -707,9 +707,10 @@ def update_config_data():
 def set_signaling_data():
     if request.method == 'POST':
         global signaling_set_by_server
+        global signaling_ack_by_server
         global set_signaling_values 
         signaling_set_by_server=0
-        signaling_ack_by_server=0
+        signaling_ack_by_server=signaling_set_by_server-signaling_ack_by_server
         for name,label in request.form.items():
             set_signaling_values[name]=1
             signaling_set_by_server=signaling_set_by_server+1
