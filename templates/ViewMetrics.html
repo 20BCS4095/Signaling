@@ -150,15 +150,8 @@
                 <div class="collapse" id="simulatorTime">
                     <div class="card">
                         <div class="card-body">
-                            {% if data %}
-                                <ul>
-                                    {% for item in data %}
-                                        <li>{{ item }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p>No data available</p>
-                            {% endif %}
+                         <li>Simulator -> {{ printer_simulator.CurrentReplyTime }}</li>
+                         <li>Printer -> {{printer_simulator.TimeStamp}}</li>         
                         </div>
                     </div>
                 </div>
