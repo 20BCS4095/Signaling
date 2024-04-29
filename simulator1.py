@@ -762,10 +762,8 @@ def post_json():
             logging.info(f'Encrypted Data :: {encrypted_data}')
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             logging.info('--------------------------------------------------PARSE END----------------------------------------------------------------')
-            if Values['TimeStamp']==Values['CurrentReplyTime']:
-                print("YES")
-            else:
-                print("NO")
+            print(Values['TimeStamp'])
+            print(Values['CurrentReplyTime'])
             logging.info('---------------------------------------------GENERATE RESPONSE PACKET------------------------------------------------------')
             success_frame=SignalingData.response_packet()
             logging.info('----------------------------------------------------GENERATE END--------------------------------------------------------')
