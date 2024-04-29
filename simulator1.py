@@ -642,7 +642,7 @@ def view_metrics():
     status_thread = threading.Thread(target=check_printer_status)
     status_thread.daemon = True
     status_thread.start()
-    return render_template('ViewMetrics.html', data=printer_status)
+    return render_template('ViewMetrics.html', data=printer_status,printer_last_seen=last_request_time)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
