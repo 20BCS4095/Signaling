@@ -434,7 +434,7 @@ class SignalingData:
                BinaryValues['TimeStamp']=stored_binary_data[index+1:i+1]
                while index<i:
                 index+=1
-                ascii_list.append(hex(stored_binary_data[index]))
+                ascii_list.append(hex(stored_binary_data[index])[2:])
                hex_timestamp = ''.join(map(str, ascii_list))
                current_time = int(hex_timestamp, 16)
                human_readable_time = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
