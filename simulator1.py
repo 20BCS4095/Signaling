@@ -107,7 +107,6 @@ def check_printer_status():
     while True:
         if time.time() - last_request_time > 10:
             logging.info("Printer is offline")
-            print("Off",time.time()-last_request_time)
             printer_status="Printer is offline"
         else:
             logging.info("Printer is online")
