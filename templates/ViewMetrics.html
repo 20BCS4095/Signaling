@@ -104,11 +104,9 @@
                 <div class="collapse" id="printerOnline">
                     <div class="card">
                         <div class="card-body">
-                            {% if data %}
+                            {% if printer_status %}
                                 <ul>
-                                    {% for item in data %}
-                                        <li>{{ item }}</li>
-                                    {% endfor %}
+                                    <li>{{ printer_status }}</li>
                                 </ul>
                             {% else %}
                                 <p>No data available</p>
@@ -127,9 +125,7 @@
                         <div class="card-body">
                             {% if printer_last_seen %}
                                 <ul>
-                                    {% for item in printer_last_seen %}
-                                        <li>{{ item }}</li>
-                                    {% endfor %}
+                                    <li>{{ printer_last_seen }}</li>
                                 </ul>
                             {% else %}
                                 <p>No data available</p>
