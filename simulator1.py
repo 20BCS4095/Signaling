@@ -513,7 +513,6 @@ class SignalingData:
 
     def response_packet():
         global signaling_ack_by_server
-        signaling_ack_by_server=0
         index=0
         decimal_values=[]
         encrypted_values=[]
@@ -778,7 +777,6 @@ def post_json():
             logging.info('HTTP Request success for GET')
             logging.info('HTTP Response code 200')
             logging.info('---------------------------------------------GENERATE RESPONSE PACKET------------------------------------------------------')
-            success_frame=SignalingData.response_packet()
             return success_frame, 200
         else:
             logging.info('HTTP Request fail for get')
