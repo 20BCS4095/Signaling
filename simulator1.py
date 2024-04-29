@@ -11,7 +11,8 @@ import logging
 app = Flask(__name__)
 name_file="app.log"
 logging.basicConfig(filename=name_file, level=logging.INFO, format="[%(created)d] - %(message)s")
-
+last_request_time = time.time()
+printer_status="Online Line"
 sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
 download_data = []
 update_config_data = {}
@@ -98,6 +99,22 @@ Signaling_variables ={
 'Connectivity Configuration ':0,
 'Device Configuration ':0,
 }
+
+def check_printer_status():
+    global last_request_time
+    global printer_status
+    while True:
+        if time.time() - last_request_time > 10:
+            logging.info("Printer is offline")
+            printer_status="Printer is offline"
+        else:
+            logging.info("Printer is online")
+            printer_status="Printer is online"
+        time.sleep(5)
+
+status_thread = threading.Thread(target=check_printer_status)
+status_thread.daemon = True
+status_thread.start()
 
 class Version():
     major=SUPPORTED_MAJOR_VERSION
@@ -624,7 +641,7 @@ def update_configuration():
 
 @app.route('/view_metrics',methods = ['GET'])
 def view_metrics():
-    return render_template('ViewMetrics.html', data=sample_data)
+    return render_template('ViewMetrics.html', data=printer_status)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
@@ -700,6 +717,8 @@ def reset_signaling_data():
 
 @app.route('/post_json', methods = ['POST','GET'])
 def post_json():
+    global last_request_time
+    last_request_time = time.time()
     global stored_binary_data 
     global success_frame
     if request.method == 'POST':
