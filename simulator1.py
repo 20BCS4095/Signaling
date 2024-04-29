@@ -512,7 +512,7 @@ class SignalingData:
         return Values
 
     def response_packet():
-        global signaling_ack_by_server
+        global signaling_ack_by_server=0
         index=0
         decimal_values=[]
         encrypted_values=[]
