@@ -115,10 +115,6 @@ def check_printer_status():
             printer_status="Printer is online"
         time.sleep(5)
 
-status_thread = threading.Thread(target=check_printer_status)
-status_thread.daemon = True
-status_thread.start()
-
 class Version():
     major=SUPPORTED_MAJOR_VERSION
     minor=SUPPORTED_MINOR_VERSION
@@ -644,6 +640,9 @@ def update_configuration():
 
 @app.route('/view_metrics',methods = ['GET'])
 def view_metrics():
+    status_thread = threading.Thread(target=check_printer_status)
+    status_thread.daemon = True
+    status_thread.start()
     return render_template('ViewMetrics.html', data=printer_status)
 
 @app.route('/duration_test',methods = ['GET'])
