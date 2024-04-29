@@ -602,6 +602,9 @@ class SignalingData:
         decimal_values.append(SignalingData.encode_tlv(Variable.EpochTimeCurrReply,4))
         current_time =int(time.time())
         hex_output = hex(current_time)[2:].upper()
+        current_time = int(hex_output, 16)
+        human_readable_time = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
+        Values['CurrentReplyTime']=human_readable_time
         hex_digits = [hex_output[i:i+2] for i in range(0, len(hex_output), 2)]
         logging.info(f'Signaling :: Generate ReplyTimeStamp {hex_digits}')
         for x in hex_digits:
