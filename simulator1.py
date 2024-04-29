@@ -107,11 +107,10 @@ def check_printer_status():
     while True:
         if time.time() - last_request_time > 10:
             logging.info("Printer is offline")
-            print("Off",time.time(),last_request_time)
+            print("Off",time.time()-last_request_time)
             printer_status="Printer is offline"
         else:
             logging.info("Printer is online")
-            print("On",time.time()-last_request_time)
             printer_status="Printer is online"
         time.sleep(5)
 
@@ -721,7 +720,6 @@ def reset_signaling_data():
 def post_json():
     global last_request_time
     last_request_time = time.time()
-    print(last_request_time)
     global stored_binary_data 
     global success_frame
     if request.method == 'POST':
