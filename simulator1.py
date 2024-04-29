@@ -644,7 +644,7 @@ def view_metrics():
     epoch_time=last_request_time
     normal_time = datetime.datetime.utcfromtimestamp(epoch_time)
     m=normal_time.strftime('%Y-%m-%d %H:%M:%S')
-    return render_template('ViewMetrics.html', data=printer_status,printer_last_seen=m)
+    return render_template('ViewMetrics.html', printer_status=printer_status,printer_last_seen=m,data=sample_data)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
