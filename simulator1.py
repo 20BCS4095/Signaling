@@ -553,6 +553,7 @@ class SignalingData:
                 m=SignalingData.setCollectionContent(key,value)
                 if m==0:
                   a=[192,0,127]
+                  signaling_ack_by_server=signaling_ack_by_server+1
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
