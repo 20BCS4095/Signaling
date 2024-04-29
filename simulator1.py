@@ -53,7 +53,8 @@ Values={
 'Descriptor':'0',
 'PrinterStatus':'',
 'AppFlagAsk':'',
-'AppFlagAskSignal':''
+'AppFlagAskSignal':'',
+'CurrentReplyTime':''
 }
 BinaryValues={
 'CollectionId':b'',
