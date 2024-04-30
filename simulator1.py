@@ -1,5 +1,5 @@
 import json
-from flask import Flask, jsonify, redirect, request, render_template, url_for
+from flask import Flask, jsonify, redirect, request, render_template, Response
 import datetime
 from enum import IntEnum
 from cryptography.hazmat.backends import default_backend
@@ -9,6 +9,7 @@ import time
 import threading
 import logging
 import random
+import hashlib
 
 app = Flask(__name__)
 
@@ -767,6 +768,9 @@ def reset_signaling_data():
         </script>
         """
         return popup_script 
+def generate_etag(data):
+    data_str = str(data).encode('utf-8')
+    return hashlib.sha256(data_str).hexdigest()
 
 @app.route('/post_json', methods = ['POST','GET'])
 def post_json():
@@ -810,16 +814,16 @@ def post_json():
             logger1.info('HTTP Response code 400')
             return 'No data is received', 400
     elif request.method == 'GET':
-        if stored_binary_data:
+        etag = generate_etag(success_frame)
+        if request.headers.get('If-None-Match') == etag:
+            logger1.info('HTTP Request Modify for get')
+            logger1.info('HTTP Response code 304')
+            return Response(status=304)
+        else:
             logger1.info('HTTP Request success for GET')
             logger1.info('HTTP Response code 200')
             logger1.info('---------------------------------------------GENERATE RESPONSE PACKET------------------------------------------------------')
             return success_frame, 200
-        else:
-            logger1.info('HTTP Request fail for get')
-            logger1.info('HTTP Response code 400')
-            return error_frame,400
-
 @app.route('/view', methods=['GET'])
 def get_json():
     global stored_binary_data
