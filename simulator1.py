@@ -27,6 +27,8 @@ file_handler2 = logging.FileHandler('logfile2.log')
 file_handler2.setFormatter(formatter)
 logger2.addHandler(file_handler2)
 
+EtagLast=''
+EtagPresent='0'
 last_request_time = 0
 printer_status="Not started to polling"
 sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
@@ -774,7 +776,7 @@ def generate_etag(data):
 
 @app.route('/post_json', methods = ['POST','GET'])
 def post_json():
-    global last_request_time
+    global last_request_time,EtagLast,EtagPresent
     global printer_simulator
     last_request_time = time.time()
     global stored_binary_data 
@@ -814,8 +816,9 @@ def post_json():
             logger1.info('HTTP Response code 400')
             return 'No data is received', 400
     elif request.method == 'GET':
-        etag = generate_etag(success_frame)
-        if request.headers.get('If-None-Match') == etag:
+        EtagLast=EtagPresent
+        EtagPresent = generate_etag(success_frame)
+        if EtagLast == EtagPresent:
             logger1.info('HTTP Request Modify for get')
             logger1.info('HTTP Response code 304')
             return Response(status=304)
