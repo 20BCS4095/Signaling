@@ -99,7 +99,7 @@
             <div class="col-lg-2"></div>
             <div class="col-lg-3">
                 <button class="btn btn-primary mb-3" type="button" data-toggle="collapse" data-target="#printerOnline" aria-expanded="false" aria-controls="printerOnline">
-                 Printer Online
+                 Printer Status
                 </button>
                 <div class="collapse" id="printerOnline">
                     <div class="card">
@@ -117,7 +117,7 @@
                 <div class="collapse" id="pollingFrequency">
                     <div class="card">
                         <div class="card-body">
-                           <li>{{ printer_last_seen }}</li>
+                           <li>Time Printer last seen -> {{ printer_last_seen }}</li>
                         </div>
                     </div>
                 </div>
@@ -126,14 +126,14 @@
             <div class="col-lg-2"></div>
             <div class="col-lg-3" >
                 <button class="btn btn-primary mb-3" type="button" data-toggle="collapse" data-target="#signalSetByServer" aria-expanded="false" aria-controls="signalSetByServer">
-                Signal set by server vs Signal ack by printer
+                Signal Set  vs Signal Ack
                 </button>
                 <div class="collapse" id="signalSetByServer">
                     <div class="card">
                         <div class="card-body">
-                            <li>Set -> {{signal_set}}</li>
-                            <li>Ack -> {{signal_ack}}</li>
-                            <li>Set vs Ack -> {{set_ask}}%</li>
+                            <li>Signal Set From Server-> {{signal_set}}</li>
+                            <li>Ack Get From Printer -> {{signal_ack}}</li>
+                            <li>Signal Set vs Signal Ack -> {{set_ask}}%</li>
                         </div>
                     </div>
                 </div>
@@ -164,9 +164,9 @@
                     <div class="card">
                         <div class="card-body">
                             {% if polling_frequency %}
-                            <li>Polling Delay -> {{polling_delay}}</li>
-                            <li>Random Window -> {{random_window}}</li>
-                            <li>Polling Frequency -> {{ polling_frequency }}</li>
+                            <li>Polling Delay -> {{polling_delay}}s</li>
+                            <li>Random Window -> {{random_window}}s</li>
+                            <li>Polling Frequency -> {{ polling_frequency }}s</li>
                             {% else %}
                                 <p>No data available</p>
                             {% endif %}
