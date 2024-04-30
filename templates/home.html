@@ -56,6 +56,25 @@
             background-color: #007bff;
             color: #fff;
         }
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Adjust the gap between cards */
+        }
+        .card {
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            margin-left: 150px;
+            margin-right: 150px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            flex: 1;
+        }
+        li {
+        text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -69,9 +88,32 @@
         <a href="/reset_a_signal">ReSet a Signal</a>
         </div><div class="menu">
         <a href="/update_configuration">Update a Signal Configuration</a></div>
-        <div class="menu">
+    <div class="menu">
         <a href="/view_metrics">View Collection Metrics</a>
-        <a href="/duration_test">Duration Test</a>
+        <a href="/duration_test">Duration Test</a></div>
+        <div class="menu">
+        <a href="/packet_decoder">Packet Decoder</a>
     </div>
+    <br>
+    {% if set_signal_data %}
+    <div class="card-container">
+    <div class="card">
+        <div class="services"> <h2>Signaling Set by Server</h2></div>
+        {% for item in set_signal_data %}
+                <li>{{ item }}</li>
+        {% endfor %}
+        </div>
+        <div class="card">
+            <div class="services">  <h2>Ack from Printer</h2></div>
+            {% if reset_signal_data %}
+            {% for item in reset_signal_data %}
+                    <li>{{ item }}</li>
+            {% endfor %}
+            {% else %}
+            <li>No Ack</li>
+            {% endif %}
+            </div> 
+            </div>
+    {% endif %}
 </body>
 </html>
