@@ -438,6 +438,7 @@ class SignalingData:
                    logger2.info('Configuration get changed')
                    logger2.info(f'Old Collection Id -> {collectionId}')
                    logger2.info(f'New Collection Id -> {Values["CollectionId"]}')
+                   print("COllection ID")
                    configuration_change="Yes"
                 logger1.info('Signaling :: Parse case collection id')
                 logger1.info(f'Signaling :: CollectionId received data {Values["CollectionId"]} and length {len(Values["CollectionId"])}\n')
@@ -522,6 +523,7 @@ class SignalingData:
               if Descriptor!=Values['Descriptor'] and Descriptor!='':
                  logger2.info(f'Old Descriptor -> {Descriptor}')
                  logger2.info(f'New Descriptor -> {Values["Descriptor"]}')
+                 print("DESCRIPTOR")
                  configuration_change="YES"
               logger1.info('Signaling :: Parse case Descriptor')
               logger1.info(f'Signaling :: Descriptor received data {Values["Descriptor"]}\n')  
