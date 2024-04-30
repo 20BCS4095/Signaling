@@ -31,8 +31,8 @@ EtagLast=''
 EtagPresent='0'
 last_request_time = 0
 printer_status="Not started to polling"
-sample_data = ["Item 1", "Item 2", "Item 3", "Item 4"]
-download_data = []
+set_signal_data = []
+reset_signal_data = []
 update_config_data = {}
 reset_signaling_data = {}
 stored_binary_data = b''
@@ -105,7 +105,21 @@ set_signaling_values = {
 'connectivity_configuration': 0,
 'device_configuration': 0,
 }
-
+reset_signaling_values={
+   1:'start_tunnel_1',
+   2:'start_tunnel_2',
+   3:'start_tunnel_3',
+   4:'start_tunnel_4',
+   5:'echo',
+   6:'rtp_kick',
+   7:'fw_update',
+   8:'registration_subscription',
+   9:'cdm_pubsub_1',
+   10:'cdm_pubsub_2',
+   11:'cdm_pubsub_3',
+   12:'connectivity_configuration',
+   13:'device_configuration'
+}
 Signaling_variables ={
 'Start Tunnel 1':0,
 'Start Tunnel 2':0,
@@ -569,6 +583,7 @@ class SignalingData:
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
+                  reset_signal_data.append(reset_signaling_values[key])
                 else:
                     a=SignalingData.collectionBitmap(int(Values['Descriptor']))
                     if len(a)>5:
@@ -591,6 +606,7 @@ class SignalingData:
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
+                  reset_signal_data.append(reset_signaling_values[key])
                 else:
                     a=SignalingData.collectionBitmap(int(Values['Descriptor']))
                     if len(a)>5:
@@ -662,7 +678,7 @@ class SignalingData:
     
 @app.route('/',methods = ['GET'])
 def home_page():
-    return render_template('home.html')
+    return render_template('home.html',set_signal_data=set_signal_data,reset_signal_data=reset_signal_data)
 
 @app.route('/set_a_signal',methods = ['GET'])
 def set_a_signal():
@@ -711,10 +727,9 @@ def view_metrics():
 def duration_test():
     return render_template('DurationTest.html')
 
-@app.route('/get_data')
-def get_data():
-
-    return jsonify(sample_data)
+@app.route('/packet_decoder',methods = ['GET'])
+def packet_decoder():
+   return render_template('PacketDecoder.html')
 
 @app.route('/update_config_data', methods = ['POST'])
 def update_config_data():
@@ -758,8 +773,10 @@ def set_signaling_data():
         global set_signaling_values 
         signaling_set_by_server=signaling_set_by_server-signaling_ack_by_server
         signaling_ack_by_server=0
+        reset_signal_data.clear()
         for name,label in request.form.items():
             set_signaling_values[name]=1
+            set_signal_data.append(name)
             signaling_set_by_server=signaling_set_by_server+1
         popup_script = """
         <script>
@@ -776,6 +793,7 @@ def reset_signaling_data():
         for name,label in request.form.items(): 
             if set_signaling_values[name]==1: 
                 set_signaling_values[name]=0 
+                set_signal_data.remove(name)
         popup_script = """
         <script>
         alert('Reset application flag submitted successfully!');
@@ -823,6 +841,7 @@ def post_json():
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
+                    set_signal_data.remove(appAsk)
             return success_frame,200
         else:
             logger1.info('HTTP Request fail for post')
