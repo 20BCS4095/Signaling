@@ -69,7 +69,7 @@ Values={
 'EncryptedBlock':'',
 'EnhancedGcm':'',
 'CloudPrinterId':'',
-'Descriptor':'0',
+'Descriptor':'',
 'PrinterStatus':'',
 'AppFlagAsk':'',
 'AppFlagAskSignal':'',
