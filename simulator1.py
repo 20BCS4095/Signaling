@@ -46,6 +46,7 @@ nonce=b''
 plaintext=b''
 signaling_set_by_server=0
 signaling_ack_by_server=0
+configuration_change="NO"
 HEADER_MASK = 0xF8
 HEADER_LEN_MASK = 0x07
 TLV_BIG = 0x06
@@ -386,6 +387,7 @@ class SignalingData:
          return 1
     def RequestPacketDecode(stored_binary_data):
         index=0
+        global configuration_change
         while index < len(stored_binary_data):
             char = stored_binary_data[index]
             length,var_name=SignalingData.decode_Tlv(char)
@@ -430,7 +432,13 @@ class SignalingData:
                 while index<i:
                     index+=1
                     ascii_list.append(stored_binary_data[index])
+                collectionId=Values['CollectionId']
                 Values['CollectionId']=''.join(chr(key) for key in ascii_list)
+                if collectionId!=Values['CollectionId'] and collectionId!='':
+                   logger2.info('Configuration get changed')
+                   logger2.info(f'Old Collection Id -> {collectionId}')
+                   logger2.info(f'New Collection Id -> {Values["CollectionId"]}')
+                   configuration_change="Yes"
                 logger1.info('Signaling :: Parse case collection id')
                 logger1.info(f'Signaling :: CollectionId received data {Values["CollectionId"]} and length {len(Values["CollectionId"])}\n')
 
@@ -509,7 +517,12 @@ class SignalingData:
               i=index+length
               BinaryValues['Descriptor']=stored_binary_data[index+1:i+1]
               index=i
+              Descriptor=Values['Descriptor']
               Values['Descriptor'] = int.from_bytes(BinaryValues['Descriptor'], byteorder='big')
+              if Descriptor!=Values['Descriptor'] and Descriptor!='':
+                 logger2.info(f'Old Descriptor -> {Descriptor}')
+                 logger2.info(f'New Descriptor -> {Values["Descriptor"]}')
+                 configuration_change="YES"
               logger1.info('Signaling :: Parse case Descriptor')
               logger1.info(f'Signaling :: Descriptor received data {Values["Descriptor"]}\n')  
 
@@ -692,7 +705,7 @@ def view_metrics():
     polling_frequency=difference_in_seconds-random_number
     logger2.info(f'Polling frequency -> {polling_frequency}')
     logger2.info(f'Printer Time vs Simulator Time -> {printer_simulator} ')
-    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator,polling_delay=difference_in_seconds,random_window=random_number,polling_frequency=polling_frequency)
+    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=configuration_change,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator,polling_delay=difference_in_seconds,random_window=random_number,polling_frequency=polling_frequency)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
