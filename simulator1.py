@@ -38,7 +38,7 @@ GCM_TAG_LEN = 12
 SUPPORTED_MAJOR_VERSION = 2
 SUPPORTED_MINOR_VERSION = 0
 SIG_NONCE_LEN = 4
-
+printer_simulator="NO"
 index = 0
 collection=0
 Values={
@@ -659,7 +659,7 @@ def view_metrics():
     else:
         signal=0
     print(signal)
-    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=Values)
+    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
@@ -741,6 +741,7 @@ def reset_signaling_data():
 @app.route('/post_json', methods = ['POST','GET'])
 def post_json():
     global last_request_time
+    global printer_simulator
     last_request_time = time.time()
     global stored_binary_data 
     global success_frame
@@ -764,9 +765,9 @@ def post_json():
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             logging.info('--------------------------------------------------PARSE END----------------------------------------------------------------')
             if Values['TimeStamp']==Values['CurrentReplyTime']:
-                print("Yes")
+                printer_simulator="Yes Printer apply simulator time"
             else:
-                print("NO")
+                printer_simulator= "NO Printer doesn't apply simulator time"
             logging.info('---------------------------------------------GENERATE RESPONSE PACKET------------------------------------------------------')
             success_frame=SignalingData.response_packet()
             logging.info('----------------------------------------------------GENERATE END--------------------------------------------------------')
