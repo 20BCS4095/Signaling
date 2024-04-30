@@ -163,12 +163,10 @@
                 <div class="collapse" id="printerLastSeen">
                     <div class="card">
                         <div class="card-body">
-                            {% if data %}
-                                <ul>
-                                    {% for item in data %}
-                                        <li>{{ item }}</li>
-                                    {% endfor %}
-                                </ul>
+                            {% if polling_frequency %}
+                            <li>Polling Delay -> {{polling_delay}}</li>
+                            <li>Random Window -> {{random_window}}</li>
+                            <li>Polling Frequency -> {{ polling_frequency }}</li>
                             {% else %}
                                 <p>No data available</p>
                             {% endif %}
