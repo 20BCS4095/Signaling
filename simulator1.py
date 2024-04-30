@@ -8,6 +8,8 @@ import secrets
 import time
 import threading
 import logging
+import random
+
 app = Flask(__name__)
 name_file="app.log"
 logging.basicConfig(filename=name_file, level=logging.INFO, format="[%(created)d] - %(message)s")
@@ -662,8 +664,9 @@ def view_metrics():
     y_datetime = datetime.datetime.strptime(Values['CurrentReplyTime'], "%Y-%m-%d %H:%M:%S")
     difference = y_datetime- x_datetime
     difference_in_seconds = difference.total_seconds()
-    print("Difference in seconds:", difference_in_seconds)
-    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator)
+    random_number = random.randint(1, 10)
+    polling_frequency=difference_in_seconds-random_number
+    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator,polling_delay=difference_in_seconds,random_window=random_number,polling_frequency=polling_frequency)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
