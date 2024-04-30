@@ -658,11 +658,12 @@ def view_metrics():
         signal=((signaling_ack_by_server/signaling_set_by_server)*100)
     else:
         signal=0
-    x_datetime = datetime.strptime(Values['TimeStamp'], "%Y-%m-%d %H:%M:%S")
-    y_datetime = datetime.strptime(Values['CurrentReplyTime'], "%Y-%m-%d %H:%M:%S")
-    difference = y_datetime - x_datetime
-    difference_in_seconds = difference.total_seconds()
-    print("Difference in seconds:", difference_in_seconds)
+    # x_datetime = datetime.strptime(Values['TimeStamp'], "%Y-%m-%d %H:%M:%S")
+    # y_datetime = datetime.strptime(Values['CurrentReplyTime'], "%Y-%m-%d %H:%M:%S")
+    difference = Values['CurrentReplyTime']- Values['TimeStamp']
+    print(difference)
+    # difference_in_seconds = difference.total_seconds()
+    # print("Difference in seconds:", difference_in_seconds)
     return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=sample_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator)
 
 @app.route('/duration_test',methods = ['GET'])
