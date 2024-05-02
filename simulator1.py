@@ -678,7 +678,16 @@ class SignalingData:
     
 @app.route('/',methods = ['GET'])
 def home_page():
-    return render_template('home.html',set_signal_data=set_signal_data,reset_signal_data=reset_signal_data)
+    r_data=[]
+    s_data=[]
+    if reset_signal_data!='':
+       r_data.extend(reset_signal_data)
+       s_data.extend(set_signal_data)
+       reset_signal_data.clear()
+       set_signal_data.clear()
+    else:
+       s_data.extend(set_signal_data)
+    return render_template('home.html',set_signal_data=s_data,reset_signal_data=r_data)
 
 @app.route('/set_a_signal',methods = ['GET'])
 def set_a_signal():
@@ -773,7 +782,6 @@ def set_signaling_data():
         global set_signaling_values 
         signaling_set_by_server=signaling_set_by_server-signaling_ack_by_server
         signaling_ack_by_server=0
-        reset_signal_data.clear()
         for name,label in request.form.items():
             set_signaling_values[name]=1
             set_signal_data.append(name)
@@ -841,7 +849,6 @@ def post_json():
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
-                    set_signal_data.remove(appAsk)
             return success_frame,200
         else:
             logger1.info('HTTP Request fail for post')
