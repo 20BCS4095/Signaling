@@ -681,7 +681,7 @@ def home_page():
     r_data=[]
     s_data=[]
     s_data.extend(set_signal_data)
-    if not reset_signal_data:
+    if reset_signal_data:
        r_data.extend(reset_signal_data)
        reset_signal_data.clear()
        set_signal_data.clear()
