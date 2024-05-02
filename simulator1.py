@@ -801,7 +801,6 @@ def reset_signaling_data():
         for name,label in request.form.items(): 
             if set_signaling_values[name]==1: 
                 set_signaling_values[name]=0 
-                set_signal_data.remove(name)
         popup_script = """
         <script>
         alert('Reset application flag submitted successfully!');
