@@ -680,13 +680,11 @@ class SignalingData:
 def home_page():
     r_data=[]
     s_data=[]
+    s_data.extend(set_signal_data)
     if reset_signal_data!='':
        r_data.extend(reset_signal_data)
-       s_data.extend(set_signal_data)
        reset_signal_data.clear()
        set_signal_data.clear()
-    else:
-       s_data.extend(set_signal_data)
     return render_template('home.html',set_signal_data=s_data,reset_signal_data=r_data)
 
 @app.route('/set_a_signal',methods = ['GET'])
