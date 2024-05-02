@@ -583,7 +583,7 @@ class SignalingData:
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
-                  reset_signal_data.append(reset_signaling_values[key])
+                  # reset_signal_data.append(reset_signaling_values[key])
                 else:
                     a=SignalingData.collectionBitmap(int(Values['Descriptor']))
                     if len(a)>5:
@@ -606,7 +606,7 @@ class SignalingData:
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
-                  reset_signal_data.append(reset_signaling_values[key])
+                  # reset_signal_data.append(reset_signaling_values[key])
                 else:
                     a=SignalingData.collectionBitmap(int(Values['Descriptor']))
                     if len(a)>5:
