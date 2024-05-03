@@ -744,6 +744,7 @@ def update_config_data():
     if request.method == 'POST':
         collection_id = request.form.get('collection_id')
         descriptor = request.form.get('descriptor')
+        signature_key=request.form.get('signature_key')
         protocol_switching_policy = request.form.get('protocol_switching_policy')
         polling_delay = request.form.get('polling_delay')
         polling_timeout = request.form.get('polling_timeout')
@@ -755,6 +756,7 @@ def update_config_data():
         update_config_data = {
             'Collection ID': collection_id,
             'Descriptor': descriptor,
+            'Signature Key':signature_key,
             'Protocol Switching Policy': protocol_switching_policy,
             'Polling Delay': polling_delay,
             'Polling Timeout': polling_timeout,
