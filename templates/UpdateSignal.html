@@ -89,6 +89,9 @@
             <label for="descriptor">Descriptor:</label>
             <input type="text" id="descriptor" name="descriptor" required>
 
+            <label for="signature_key">Signature Key:</label>
+            <input type="text" id="signature_key" name="signature_key" required>
+
             <label for="protocol_switching_policy">Protocol Switching Policy:</label>
             <input type="text" id="protocol_switching_policy" name="protocol_switching_policy" required>
 
@@ -127,11 +130,19 @@
             event.target.setCustomValidity("");
         }
     });
+    document.getElementById("signature_key").addEventListener("input",function(event){
+     var inputValue=event.target.value.trim();
+     if (inputValue.length!==16){
+        event.target.setCustomValidity("Signature Key should be have length of 16 ");
+     } else{
+        event.target.setCustomValidity("");
+     }
+    });
     document.getElementById("polling_delay").addEventListener("input", function(event) {
         var inputValue = event.target.value;
         var numericValue = parseInt(inputValue);
-        if (isNaN(numericValue) || numericValue <= 0) {
-            event.target.setCustomValidity("Polling delay must be a greater  than zero.");
+        if (isNaN(numericValue) || numericValue < 0) {
+            event.target.setCustomValidity("Polling delay can't accept the negative number.");
         } else {
             event.target.setCustomValidity("");
         }
@@ -139,8 +150,8 @@
     document.getElementById("polling_timeout").addEventListener("input", function(event) {
         var inputValue = event.target.value;
         var numericValue = parseInt(inputValue);
-        if (isNaN(numericValue) || numericValue <= 0) {
-            event.target.setCustomValidity("Polling Timeout must be a greater  than zero.");
+        if (isNaN(numericValue) || numericValue < 0) {
+            event.target.setCustomValidity("Polling Timeout can't accept the negative number.");
         } else {
             event.target.setCustomValidity("");
         }
@@ -148,8 +159,8 @@
     document.getElementById("retry_grace_count").addEventListener("input", function(event) {
         var inputValue = event.target.value;
         var numericValue = parseInt(inputValue);
-        if (isNaN(numericValue) || numericValue <= 0) {
-            event.target.setCustomValidity("Retry Grace count must be a greater  than zero.");
+        if (isNaN(numericValue) || numericValue < 0) {
+            event.target.setCustomValidity("Retry Grace count can't accept the negative number.");
         } else {
             event.target.setCustomValidity("");
         }
@@ -157,8 +168,8 @@
     document.getElementById("random_window").addEventListener("input", function(event) {
         var inputValue = event.target.value;
         var numericValue = parseInt(inputValue);
-        if (isNaN(numericValue) || numericValue <= 0) {
-            event.target.setCustomValidity("Random Window must be a greater  than zero.");
+        if (isNaN(numericValue) || numericValue <0) {
+            event.target.setCustomValidity("Random Window can't accept the negative number.");
         } else {
             event.target.setCustomValidity("");
         }
@@ -166,8 +177,8 @@
     document.getElementById("printer_status_ratio").addEventListener("input", function(event) {
         var inputValue = event.target.value;
         var numericValue = parseInt(inputValue);
-        if (isNaN(numericValue) || numericValue <= 0) {
-            event.target.setCustomValidity("Printer Status ratio must be a greater  than zero.");
+        if (isNaN(numericValue) || numericValue < 0) {
+            event.target.setCustomValidity("Printer Status ratio can't accept the negative number.");
         } else {
             event.target.setCustomValidity("");
         }
@@ -175,8 +186,8 @@
     document.getElementById("max_gets_between_posts").addEventListener("input", function(event) {
         var inputValue = event.target.value;
         var numericValue = parseInt(inputValue);
-        if (isNaN(numericValue) || numericValue <= 0) {
-            event.target.setCustomValidity("Max gets between posts must be a greater  than zero.");
+        if (isNaN(numericValue) || numericValue < 0) {
+            event.target.setCustomValidity("Max gets between posts can't accept the negative number.");
         } else {
             event.target.setCustomValidity("");
         }
