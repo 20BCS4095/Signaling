@@ -1,5 +1,4 @@
-import json
-from flask import Flask, jsonify, redirect, request, render_template, Response
+from flask import Flask, request, render_template, Response
 import datetime
 from enum import IntEnum
 from cryptography.hazmat.backends import default_backend
@@ -10,6 +9,7 @@ import threading
 import logging
 import random
 import hashlib
+import subprocess
 
 app = Flask(__name__)
 
@@ -33,7 +33,32 @@ last_request_time = 0
 printer_status="Not started to polling"
 set_signal_data = []
 reset_signal_data = []
-update_config_data = {}
+update_config_data = {
+'CollectionID': '',
+'Descriptor':'',
+'SignatureKey':'',
+'ProtocolSwitchingPolicy': '',
+'PollingDelay': 0,
+'PollingTimeout':'',
+'RetryGraceCount': '',
+'RandomWindow':0,
+'PrinterStatusRatio': '',
+'MaxGetsBetweenPosts': '',
+'URL': ''
+}
+old_config_data={ 
+'CollectionID': '',
+'Descriptor':'',
+'SignatureKey':'',
+'ProtocolSwitchingPolicy': '',
+'PollingDelay': 0,
+'PollingTimeout':'',
+'RetryGraceCount': '',
+'RandomWindow':0,
+'PrinterStatusRatio': '',
+'MaxGetsBetweenPosts': '',
+'URL': ''
+}
 reset_signaling_data = {}
 stored_binary_data = b''
 success_frame = b''
@@ -44,9 +69,13 @@ stored_binary =b''
 aad=b''
 nonce=b''
 plaintext=b''
+collectionId=''
+Descriptor=''
+range_count=0
+out_count=0
 signaling_set_by_server=0
 signaling_ack_by_server=0
-configuration_change="NO"
+configuration_change=""
 HEADER_MASK = 0xF8
 HEADER_LEN_MASK = 0x07
 TLV_BIG = 0x06
@@ -141,10 +170,8 @@ def check_printer_status():
     global printer_status
     while True:
         if time.time() - last_request_time > 10:
-            logger2.info("Printer Status -> Printer is offline")
             printer_status="Printer is offline"
         else:
-            logger2.info("Printer Status -> Printer is online")
             printer_status="Printer is online"
         time.sleep(5)
 
@@ -227,6 +254,16 @@ class SignalingData:
     }
 
     @staticmethod
+    def my_function():
+     print("my function")
+    def repeat_function(duration):
+      start_time = time.time()
+      while True:
+        SignalingData.my_function()
+        elapsed_time = time.time() - start_time
+        if elapsed_time >= duration:
+            break
+
     def encode_tlv(name, length):  
         tlv = 0
         if length <= SignalingData.VariableLengthLimits_[name][1]:
@@ -241,8 +278,8 @@ class SignalingData:
         bytes_data = str.encode(key)
         return bytes_data
 
-    def gcm_parameter():
-        key=SignalingData.convert_to_bytes("TGF1cmVudCB3cm90")
+    def gcm_parameter(signatureKey):
+        key=SignalingData.convert_to_bytes(signatureKey)
         nonce=BinaryValues['IV']
         ciphertext=BinaryValues['ciphertext']
         tag=BinaryValues['tag']
@@ -401,12 +438,10 @@ class SignalingData:
          return 1
     def RequestPacketDecode(stored_binary_data):
         index=0
-        global configuration_change
+        global configuration_change,collectionId,Descriptor
         while index < len(stored_binary_data):
             char = stored_binary_data[index]
             length,var_name=SignalingData.decode_Tlv(char)
-            logger1.info(f'SignalingData :: Varname {var_name}')
-            logger1.info(f'SignalingData :: Length SignalingData {length}')
             if Variable(var_name).name == "Null":
               index+=length
             else:
@@ -422,13 +457,10 @@ class SignalingData:
                 major = (stored_binary_data[index] & 0x70) >> 5
                 minor = (stored_binary_data[index] & 0x1F)
                 Values['Version'] = str(major)+"."+str(minor)
-                logger1.info('Signaling :: Parse case version')
-                logger1.info(f'Signaling :: Parse received version {Values["Version"]}\n')
             
             elif Variable(var_name).name == "Command":
                 index+=1
                 Values['Command']=stored_binary_data[index]
-                logger1.info(f'Signaling :: Command value {Values["Command"]}')
                 if Values['Command'] == 1:
                   logger1.info(f'Signaling :: Command data {Commands.GetCollection}\n')
                 elif Values['Command'] == 0:
@@ -448,13 +480,10 @@ class SignalingData:
                     ascii_list.append(stored_binary_data[index])
                 collectionId=Values['CollectionId']
                 Values['CollectionId']=''.join(chr(key) for key in ascii_list)
-                if collectionId!=Values['CollectionId'] and collectionId!='':
-                   logger2.info('Configuration get changed')
-                   logger2.info(f'Old Collection Id -> {collectionId}')
-                   logger2.info(f'New Collection Id -> {Values["CollectionId"]}')
+                if collectionId!=Values['CollectionId'] and collectionId!='' and update_config_data['CollectionID']==Values['CollectionId']:
                    configuration_change="Yes"
-                logger1.info('Signaling :: Parse case collection id')
-                logger1.info(f'Signaling :: CollectionId received data {Values["CollectionId"]} and length {len(Values["CollectionId"])}\n')
+                else:
+                   configuration_change=""
 
             elif Variable(var_name).name == "Nonce":
                 i=index+length
@@ -465,8 +494,6 @@ class SignalingData:
                    index+=1
                    ascii_list.append(str(stored_binary_data[index]))
                 Values['Nonce']=' '.join(key for key in ascii_list)
-                logger1.info('Signaling :: Parse case nonce')
-                logger1.info(f'Signaling :: Nonce received data {Values["Nonce"]} and length {len(ascii_list)}\n')
 
             elif Variable(var_name).name == "TimeStamp":
                i=index+length
@@ -479,9 +506,7 @@ class SignalingData:
                hex_timestamp = ''.join(map(str, ascii_list))
                current_time = int(hex_timestamp, 16)
                human_readable_time = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
-               Values['TimeStamp']   = human_readable_time
-               logger1.info('Signaling :: Parse case TimeStamp')
-               logger1.info(f'Signaling :: TimeStamp received data {Values["TimeStamp"]}\n') 
+               Values['TimeStamp']   = human_readable_time 
 
             elif Variable(var_name).name == "EncryptedBlock":
                 BinaryValues['aad']=stored_binary_data[0:index+1]
@@ -493,13 +518,11 @@ class SignalingData:
                   index+=1
                   ascii_list.append(stored_binary_data[index])
                 Values['EncryptedBlock']=' '.join(map(str, ascii_list))
-                logger1.info(f'EncryptedBlock Value :: {Values["EncryptedBlock"]}')
                 request_value = [char for char in BinaryValues['aad']]
                 d=0
                 for value in request_value:
                    logger1.info(f'Parse AAD data[{d}] = {value}')
                    d=d+1
-                logger1.info('Parse AAD end\n')
 
             elif Variable(var_name).name == "EnhanceGcm":
                i=index+length
@@ -510,11 +533,7 @@ class SignalingData:
                 index+=1
                 ascii_list.append(stored_binary_data[index])
                Values['EnhancedGcm']=' '.join(map(str,ascii_list))
-               logger1.info(f'Signaling :: Enhance GCm {Values["EnhancedGcm"]}\n')
                request_value = [char for char in BinaryValues['tag']]
-               d=0
-               for value in request_value: 
-                 logger1.info(f'Gcm_tag Tag[{d}] :: {value}') 
 
             elif Variable(var_name).name == "CloudPrinterId":
                i=index+length
@@ -524,8 +543,7 @@ class SignalingData:
                 index+=1
                 ascii_list.append(stored_binary_data[index])
                Values['CloudPrinterId']=''.join(chr(key) for key in ascii_list)
-               logger1.info('Signaling :: Parse case cloudPrinterId ')
-               logger1.info(f'Signaling :: CloudPrinterId received data {Values["CloudPrinterId"]}\n') 
+ 
 
             elif Variable(var_name).name == "DeviceDescriptor":
               i=index+length
@@ -533,25 +551,20 @@ class SignalingData:
               index=i
               Descriptor=Values['Descriptor']
               Values['Descriptor'] = int.from_bytes(BinaryValues['Descriptor'], byteorder='big')
-              if Descriptor!=Values['Descriptor'] and Descriptor!='':
-                 logger2.info(f'Old Descriptor -> {Descriptor}')
-                 logger2.info(f'New Descriptor -> {Values["Descriptor"]}')
+              if Descriptor!=Values['Descriptor'] and Descriptor!='' and update_config_data['Descriptor']==Values['Descriptor']:
                  configuration_change="YES"
-              logger1.info('Signaling :: Parse case Descriptor')
-              logger1.info(f'Signaling :: Descriptor received data {Values["Descriptor"]}\n')  
+              else:
+                 configuration_change="" 
 
             elif Variable(var_name).name == "AppFlagsAck":
               i=index+length
               Values['AppFlagAsk'] = stored_binary_data[index+1:i+1]
               index=i
-              logger1.info(f'AppFlagAsk :: {Values["AppFlagAsk"]}\n')  
 
             elif Variable(var_name).name == "PrinterStatus":
               i=index+length
               Values['PrinterStatus']=stored_binary_data[index+1:i+1]
-              index=i
-              logger1.info('Signaling :: Parse case PrinterStatus')
-              logger1.info(f'Signaling :: Printer Status received data {Values["PrinterStatus"]}\n')  
+              index=i  
             else:
               print("Other")
             index += 1
@@ -620,7 +633,6 @@ class SignalingData:
                        encrypted_values.append(x)
 
         #-----------------------------Command--------------------------#
-        logger1.info(f'Signaling :: Generate Command {int(Commands.ChangeRetryGraceCnt)}')
         encrypted_values.append(SignalingData.encode_tlv(Variable.Command,1))
         encrypted_values.append(int(Commands.ChangeRetryGraceCnt))
         encrypted_values.append(5)
@@ -628,7 +640,6 @@ class SignalingData:
         #encrypted_values.append(SignalingData.encode_tlv(Variable.Padding,1))
         #---------------------------------Version------------------------------#
         if Values['Version']=="2.0":
-            logger1.info(f'Signaling :: Generate Version {Version.major<<5 | Version.minor}')
             decimal_values.append(SignalingData.encode_tlv(Variable.Version, 1))
             decimal_values.append(Version.major<<5 | Version.minor)
         else:
@@ -637,11 +648,9 @@ class SignalingData:
         decimal_values.append(SignalingData.encode_tlv(Variable.CollectionId,len(Values["CollectionId"])))
         decimal_values += [ord(char) for char in Values['CollectionId']]
         enhance_gcm+=[ord(char) for char in Values['CollectionId']]
-        logger1.info(f'Signaling :: Generate Collection ID {decimal_values}')
         #-------------------------------NONCE-----------------------------------------#
         decimal_values.append(SignalingData.encode_tlv(Variable.Nonce,SIG_NONCE_LEN))
         random_bits = secrets.token_bytes(SIG_NONCE_LEN)
-        logger1.info(f'Signaling :: Generate Nonce {random_bits}')
         while index<SIG_NONCE_LEN:
             decimal_values.append(random_bits[index])
             enhance_gcm.append(random_bits[index])
@@ -654,15 +663,12 @@ class SignalingData:
         human_readable_time = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
         Values['CurrentReplyTime']=human_readable_time
         hex_digits = [hex_output[i:i+2] for i in range(0, len(hex_output), 2)]
-        logger1.info(f'Signaling :: Generate ReplyTimeStamp {hex_digits}')
         for x in hex_digits:
             decimal_values.append(int(x,16))
             enhance_gcm.append(int(x,16))
         #---------------------------Encrypted Block-------------------------------------#
         decimal_values.append(SignalingData.encode_tlv(Variable.EncryptedBlock,len(encrypted_values)))
         decimal_values.append(len(encrypted_values))
-        logger1.info(f'Signaling :: EncryptedBlock length {len(encrypted_values)}')
-        logger1.info('Signaling :: Encrypted data')
         #------------------------------------------------------------------------
         aad=SignalingData.convert_decimaltohexabinary(decimal_values)
         plaintext=SignalingData.convert_decimaltohexabinary(encrypted_values)
@@ -671,9 +677,6 @@ class SignalingData:
         result=SignalingData.aes_gcm_encrypt(key,nonce,plaintext,aad)
         de=SignalingData.aes_gcm_decrypt(key,nonce,result[0],result[1],aad)
         stored_binary= bytes(aad+result[0]+bytes([SignalingData.encode_tlv(Variable.EnhanceGcm,GCM_TAG_LEN)])+bytes([len(result[1])])+result[1])
-        request_value = [char for char in stored_binary]
-        for value in request_value:
-           logger1.info(f'{value}')
         return stored_binary
     
 @app.route('/',methods = ['GET'])
@@ -702,33 +705,19 @@ def update_configuration():
 
 @app.route('/view_metrics',methods = ['GET'])
 def view_metrics():
+    global update_config_data
     status_thread = threading.Thread(target=check_printer_status)
     status_thread.daemon = True
     status_thread.start()
     epoch_time=last_request_time
     normal_time = datetime.datetime.utcfromtimestamp(epoch_time)
     m=normal_time.strftime('%Y-%m-%d %H:%M:%S')
-    logger2.info(f'Printer Last Seen -> {m}')
     if signaling_set_by_server!=0:
-        logger2.info(f'Signal Set -> {signaling_set_by_server}')
-        logger2.info(f'Ack from Printer -> {signaling_ack_by_server}')
         signal=((signaling_ack_by_server/signaling_set_by_server)*100)
-        logger2.info(f'Signal set vs Ack -> {signal}%')
     else:
-        logger2.info(f'No signal is Set by simulator')
-        signal=0
-    if Values['TimeStamp']!='' and Values['CurrentReplyTime']!='':
-       x_datetime = datetime.datetime.strptime(Values['TimeStamp'], "%Y-%m-%d %H:%M:%S")
-       y_datetime = datetime.datetime.strptime(Values['CurrentReplyTime'], "%Y-%m-%d %H:%M:%S")
-       difference = y_datetime- x_datetime
-       difference_in_seconds = difference.total_seconds()
-    else:
-       difference_in_seconds=0.0
-    random_number = random.randint(1, 10)
-    polling_frequency=difference_in_seconds-random_number
-    logger2.info(f'Polling frequency -> {polling_frequency}')
-    logger2.info(f'Printer Time vs Simulator Time -> {printer_simulator} ')
-    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data=configuration_change,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator,polling_delay=difference_in_seconds,random_window=random_number,polling_frequency=polling_frequency)
+        signal=0.0
+
+    return render_template('ViewMetrics.html', printer_online=printer_status,printer_last_seen=m,data2=configuration_change,data=old_config_data,data1=update_config_data,signal_set=signaling_set_by_server,signal_ack=signaling_ack_by_server,set_ask=signal,printer_simulator=printer_simulator,polling_delay=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])),polling_frequency=update_config_data["PollingDelay"],count=range_count,out=out_count)
 
 @app.route('/duration_test',methods = ['GET'])
 def duration_test():
@@ -742,6 +731,8 @@ def packet_decoder():
 def update_config_data():
     global update_config_data
     if request.method == 'POST':
+        global old_config_data
+        old_config_data=update_config_data
         collection_id = request.form.get('collection_id')
         descriptor = request.form.get('descriptor')
         signature_key=request.form.get('signature_key')
@@ -754,18 +745,28 @@ def update_config_data():
         max_gets_between_posts = request.form.get('max_gets_between_posts')
         url = request.form.get('url')
         update_config_data = {
-            'Collection ID': collection_id,
+            'CollectionID': collection_id,
             'Descriptor': descriptor,
-            'Signature Key':signature_key,
-            'Protocol Switching Policy': protocol_switching_policy,
-            'Polling Delay': polling_delay,
-            'Polling Timeout': polling_timeout,
-            'Retry Grace Count': retry_grace_count,
-            'Random Window': random_window,
-            'Printer Status Ratio': printer_status_ratio,
-            'Max Gets Between Posts': max_gets_between_posts,
+            'SignatureKey':signature_key,
+            'ProtocolSwitchingPolicy': protocol_switching_policy,
+            'PollingDelay': polling_delay,
+            'PollingTimeout': polling_timeout,
+            'RetryGraceCount': retry_grace_count,
+            'RandomWindow': random_window,
+            'PrinterStatusRatio': printer_status_ratio,
+            'MaxGetsBetweenPosts': max_gets_between_posts,
             'URL': url
         }
+        base_url = 'http://{}/hp/device/WSFramework/underware/v1/command'
+        ip_address = '10.224.1.109'
+        url1 = base_url.format(ip_address)
+        command1="Signaling PUB_setSignalingConfig "+update_config_data["CollectionID"]+" "+update_config_data["Descriptor"]+" "+update_config_data["SignatureKey"]+" "+update_config_data["ProtocolSwitchingPolicy"]
+        curl_command1 = f'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"{command1}"}}\' {url1}'
+        result = subprocess.run(curl_command1, shell=True, capture_output=True, text=True)
+        command2="Signaling PUB_setHttpSignalingConfig "+update_config_data["PollingDelay"]+" "+update_config_data["PollingTimeout"]+" "+update_config_data["RetryGraceCount"]+" "+update_config_data["RandomWindow"]+" "+update_config_data["PrinterStatusRatio"]+" "+update_config_data["MaxGetsBetweenPosts"]+" "+update_config_data["URL"]
+        curl_command2 = f'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"{command2}"}}\' {url1}'
+        result = subprocess.run(curl_command2, shell=True, capture_output=True, text=True)
+        
         popup_script = """
         <script>
         alert('Configuration form submitted successfully!');
@@ -774,6 +775,14 @@ def update_config_data():
         """
         return popup_script
     
+@app.route('/get_duration', methods=['POST'])
+def get_duration():
+    duration_hours = float(request.form['hours']) 
+    duration_seconds = duration_hours * 3600  # Convert hours to seconds
+    SignalingData.repeat_function(duration_seconds)   
+    
+    return str(duration_seconds)
+
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
     if request.method == 'POST':
@@ -815,8 +824,19 @@ def generate_etag(data):
 @app.route('/post_json', methods = ['POST','GET'])
 def post_json():
     global last_request_time,EtagLast,EtagPresent
-    global printer_simulator
+    global printer_simulator,range_count,out_count
     last_request_time = time.time()
+    if Values['TimeStamp']!='' and Values['CurrentReplyTime']!='':
+       x_datetime = datetime.datetime.strptime(Values['TimeStamp'], "%Y-%m-%d %H:%M:%S")
+       y_datetime = datetime.datetime.strptime(Values['CurrentReplyTime'], "%Y-%m-%d %H:%M:%S")
+       difference = y_datetime- x_datetime
+       difference_in_seconds = difference.total_seconds()
+    else:
+       difference_in_seconds=0.0
+    if difference_in_seconds>=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])) and difference_in_seconds<=update_config_data["PollingDelay"]:
+       range_count+=1
+    else:
+       out_count+=1
     global stored_binary_data 
     global success_frame
     if request.method == 'POST':
@@ -824,46 +844,27 @@ def post_json():
             stored_binary_data = request.data
             request_value = [char for char in stored_binary_data]
             request_data = ' '.join(map(str, request_value))
-            i=0
-            for value in request_value:
-               logger1.info(f'curl request[{i}] :: {value}')
-               i=i+1
-            logger1.info('HTTP Request success for POST')
-            logger1.info('HTTP Response code 200')
-            logger1.info(f'RawPayload : {request_data}')
-            logger1.info('------------------------------------------------ PARSE START -------------------------------------------------------------')
             decoder_value=SignalingData.RequestPacketDecode(stored_binary_data)
-            key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter()
+            key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter(update_config_data["SignatureKey"])
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
-            logger1.info(f'Encrypted Data :: {encrypted_data}')
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
-            logger1.info('--------------------------------------------------PARSE END----------------------------------------------------------------')
             if Values['TimeStamp']==Values['CurrentReplyTime']:
                 printer_simulator="Yes Printer apply simulator time"
             else:
                 printer_simulator= "NO Printer doesn't apply simulator time"
-            logger1.info('---------------------------------------------GENERATE RESPONSE PACKET------------------------------------------------------')
             success_frame=SignalingData.response_packet()
-            logger1.info('----------------------------------------------------GENERATE END--------------------------------------------------------')
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
             return success_frame,200
         else:
-            logger1.info('HTTP Request fail for post')
-            logger1.info('HTTP Response code 400')
             return 'No data is received', 400
     elif request.method == 'GET':
         EtagLast=EtagPresent
         EtagPresent = generate_etag(success_frame)
         if EtagLast == EtagPresent:
-            logger1.info('HTTP Request Modify for get')
-            logger1.info('HTTP Response code 304')
             return Response(status=304)
         else:
-            logger1.info('HTTP Request success for GET')
-            logger1.info('HTTP Response code 200')
-            logger1.info('---------------------------------------------GENERATE RESPONSE PACKET------------------------------------------------------')
             return success_frame, 200
 @app.route('/view', methods=['GET'])
 def get_json():
