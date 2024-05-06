@@ -254,8 +254,12 @@ class SignalingData:
     }
 
     @staticmethod
+    def clear_logs(log_file):
+      with open(log_file, 'w') as f:
+        f.truncate(0)
+      print("Logs cleared successfully.")
     def my_function():
-     print("my function")
+     logger1.info('Function')
     def repeat_function(duration):
       start_time = time.time()
       while True:
@@ -779,10 +783,12 @@ def update_config_data():
 @app.route('/get_duration', methods=['POST'])
 def get_duration():
     duration_hours = float(request.form['hours']) 
-    duration_seconds = duration_hours * 3  # Convert hours to seconds
+    duration_seconds = duration_hours * 1  # Convert hours to seconds
     SignalingData.repeat_function(duration_seconds)   
-    
-    return str(duration_seconds)
+    logs = []
+    with open('logfile1.log', 'r') as f:
+        logs = f.readlines()
+    return render_template('logs.html', logs=logs)
 
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
