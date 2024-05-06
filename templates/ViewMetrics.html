@@ -164,9 +164,9 @@
                     <div class="card">
                         <div class="card-body">
                             {% if polling_frequency %}
-                            <li>Polling Delay -> {{polling_delay}}s</li>
-                            <li>Random Window -> {{random_window}}s</li>
-                            <li>Polling Frequency -> {{ polling_frequency }}s</li>
+                            <li>Polling frequency Range -> {{polling_delay}} - {{ polling_frequency }}</li>
+                            <li>Between range count -> {{count}}</li>
+                            <li>Out Of range count -> {{out}}</li>
                             {% else %}
                                 <p>No data available</p>
                             {% endif %}
@@ -182,7 +182,35 @@
                 <div class="collapse" id="configurationChange">
                     <div class="card">
                         <div class="card-body">
-                          <li>{{ data }}</li>
+                            {% if data2 %}
+                            <li>Old COnfiguration </li>
+                            <li>Collection Id -> {{data.CollectionID}}</li>
+                            <li>Descriptor  -> {{data.Descriptor}}</li>
+                            <li>Signature Key -> {{data.SignatureKey}}</li>
+                            <li>Protocol Switching Policy -> {{data.ProtocolSwitchingPolicy}}</li>
+                            <li>Polling Delay -> {{data.PollingDelay}}</li>
+                            <li>Polling Timeout -> {{data.PollingTimeout}}</li>
+                            <li>Retry Grace Count -> {{data.RetryGraceCount}}</li>
+                            <li>Random Window -> {{data.RandomWindow}}</li>
+                            <li>Printer Status Ratio -> {{data.PrinterStatusRatio}}</li>
+                            <li>Max Gets Between Posts -> {{data.MaxGetsBetweenPosts}}</li>
+                            <li>Url -> {{data.URL}}</li>
+                            <hr>
+                            <li>New COnfiguration </li>
+                            <li>Collection Id -> {{data1.CollectionID}}</li>
+                            <li>Descriptor  -> {{data1.Descriptor}}</li>
+                            <li>Signature Key -> {{data1.SignatureKey}}</li>
+                            <li>Protocol Switching Policy -> {{data1.ProtocolSwitchingPolicy}}</li>
+                            <li>Polling Delay -> {{data1.PollingDelay}}</li>
+                            <li>Polling Timeout -> {{data1.PollingTimeout}}</li>
+                            <li>Retry Grace Count -> {{data1.RetryGraceCount}}</li>
+                            <li>Random Window -> {{data1.RandomWindow}}</li>
+                            <li>Printer Status Ratio -> {{data1.PrinterStatusRatio}}</li>
+                            <li>Max Gets Between Posts -> {{data1.MaxGetsBetweenPosts}}</li>
+                            <li>Url -> {{data1.URL}}</li>
+                            {% else %}
+                                <p>No </p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
