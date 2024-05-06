@@ -757,7 +757,7 @@ def update_config_data():
             'URL': url
         }
         base_url = 'http://{}/hp/device/WSFramework/underware/v1/command'
-        ip_address = '10.224.1.109'
+        ip_address = request.form.get('printer_ip')
         url1 = base_url.format(ip_address)
         command1="Signaling PUB_setSignalingConfig "+update_config_data["CollectionID"]+" "+update_config_data["Descriptor"]+" "+update_config_data["SignatureKey"]+" "+update_config_data["ProtocolSwitchingPolicy"]
         curl_command1 = f'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"{command1}"}}\' {url1}'
