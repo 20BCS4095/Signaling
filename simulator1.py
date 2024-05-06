@@ -248,12 +248,14 @@ class SignalingData:
 
     @staticmethod
     def clear_logs(log_file):
-      with open(log_file1, 'w') as f:
+      with open(log_file, 'w') as f:
         f.truncate(0)
       print("Logs cleared successfully.")
     def my_function():
      logger1.info('Function')
     def repeat_function(duration):
+      log_file = 'logfile1.log'
+      SignalingData.clear_logs(log_file)
       start_time = time.time()
       while True:
         SignalingData.my_function()
