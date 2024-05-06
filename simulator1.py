@@ -20,13 +20,6 @@ formatter = logging.Formatter('[%(asctime)s] - %(message)s')
 file_handler1.setFormatter(formatter)
 logger1.addHandler(file_handler1)
 
-# Configure the View metrics logger
-logger2 = logging.getLogger('logger2')
-logger2.setLevel(logging.DEBUG)
-file_handler2 = logging.FileHandler('logfile2.log')
-file_handler2.setFormatter(formatter)
-logger2.addHandler(file_handler2)
-
 EtagLast=''
 EtagPresent='0'
 last_request_time = 0
@@ -255,7 +248,7 @@ class SignalingData:
 
     @staticmethod
     def clear_logs(log_file):
-      with open(log_file, 'w') as f:
+      with open(log_file1, 'w') as f:
         f.truncate(0)
       print("Logs cleared successfully.")
     def my_function():
