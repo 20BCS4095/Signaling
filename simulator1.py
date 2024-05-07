@@ -761,10 +761,10 @@ def update_config_data():
         url1 = base_url.format(ip_address)
         command1="Signaling PUB_setSignalingConfig "+update_config_data["CollectionID"]+" "+update_config_data["Descriptor"]+" "+update_config_data["SignatureKey"]+" "+update_config_data["ProtocolSwitchingPolicy"]
         curl_command1 = f'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"{command1}"}}\' {url1}'
-        # result = subprocess.run(curl_command1, shell=True, capture_output=True, text=True)
+        result = subprocess.run(curl_command1, shell=True, capture_output=True, text=True)
         command2="Signaling PUB_setHttpSignalingConfig "+update_config_data["PollingDelay"]+" "+update_config_data["PollingTimeout"]+" "+update_config_data["RetryGraceCount"]+" "+update_config_data["RandomWindow"]+" "+update_config_data["PrinterStatusRatio"]+" "+update_config_data["MaxGetsBetweenPosts"]+" "+update_config_data["URL"]
         curl_command2 = f'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"{command2}"}}\' {url1}'
-        # result = subprocess.run(curl_command2, shell=True, capture_output=True, text=True)
+        result = subprocess.run(curl_command2, shell=True, capture_output=True, text=True)
         print(curl_command1,curl_command2)
         
         popup_script = """
