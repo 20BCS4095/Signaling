@@ -833,7 +833,9 @@ def update_config_data1():
 def get_duration():
     duration_hours = float(request.form['hours']) 
     duration_seconds = duration_hours * 360  # Convert hours to seconds
-    SignalingData.repeat_function(duration_seconds)   
+    status_thread = threading.Thread(target=SignalingData.repeat_function(duration_seconds))
+    status_thread.daemon = True
+    status_thread.start()   
     logs = []
     with open('logfile1.log', 'r') as f:
         logs = f.readlines()
