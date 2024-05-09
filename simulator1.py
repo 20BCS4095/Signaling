@@ -185,33 +185,15 @@ def repeat_function(duration):
     start_time = time.time()
     end_time =start_time +duration
     options=["start_tunnel_1","start_tunnel_2","start_tunnel_3","start_tunnel_4","echo","rtp_kick","fw_update","registration_subscription","cdm_pubsub_1","cdm_pubsub_2","cdm_pubsub_3","connectivity_configuration","device_configuration"]
-    num_keys = random.randint(1, 2)
-    random_keys = random.sample(options, num_keys)
-    selected=[]
-    if num_keys==2:
-        set_count+=2
-        set_signaling_values[random_keys[0]]=1
-        set_signaling_values[random_keys[1]]=1
-        logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
-    else:
-        set_count+=1
-        set_signaling_values[random_keys[0]]=1
-        logger1.info(f'Selected signaling {random_keys[0]}')
-    while time.time()<end_time:
-        if set_signaling_values[random_keys[0]]:
-            num_keys = random.randint(1, 2)
-            random_keys = random.sample(options, num_keys)
-            if num_keys==2:
-              set_count+=2
-              set_signaling_values[random_keys[0]]=1
-              set_signaling_values[random_keys[1]]=1
-              logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
-            else:
-               set_count+=1
-               set_signaling_values[random_keys[0]]=1
-               logger1.info(f'Selected signaling {random_keys[0]}')
-    if set_signaling_values[random_keys[0]]!=0:
-        time.sleep(50)
+    while time.time() < end_time:
+        num_keys = random.randint(1, min(2, len(options)))
+        random_keys = random.sample(options, num_keys)
+        for key in random_keys:
+            set_signaling_values[key] = 1
+            set_count += 1
+            logger1.info(f'Selected signaling {key}')
+            time.sleep(1)
+    time.sleep(50)
     logger1.info('------------------Duration test completed-----------------------')
     logger1.info(f'Total no of bit set by server -> {set_count}')
     logger1.info(f'Total no of bit ack -> {reset_count}')
