@@ -10,7 +10,7 @@ import logging
 import random
 import hashlib
 import subprocess
-
+import binascii
 app = Flask(__name__)
 
 logger1 = logging.getLogger('logger1')
