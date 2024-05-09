@@ -93,7 +93,7 @@ Values={
 'CloudPrinterId':'',
 'Descriptor':'',
 'PrinterStatus':'',
-'AppFlagAsk':b'',
+'AppFlagAsk':b'\x00\x00',
 'AppFlagAskSignal':'',
 'CurrentReplyTime':''
 }
