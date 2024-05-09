@@ -251,17 +251,48 @@ class SignalingData:
       with open(log_file, 'w') as f:
         f.truncate(0)
       print("Logs cleared successfully.")
-    def my_function():
-     logger1.info('Function')
+       
     def repeat_function(duration):
+      set_count=0
+      reset_count=0
       log_file = 'logfile1.log'
       SignalingData.clear_logs(log_file)
+      logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
       start_time = time.time()
       while True:
-        SignalingData.my_function()
+        i=0
+        for key,values in set_signaling_values.items():
+           set_count+=1
+           logger1.info(f'Printer Status -> {printer_status}')
+           epoch_time=last_request_time
+           normal_time = datetime.datetime.utcfromtimestamp(epoch_time)
+           m=normal_time.strftime('%Y-%m-%d %H:%M:%S')
+           logger1.info(f'Printer Last seen -> {m}')
+           logger1.info(f'Polling Frequency within range count -> {range_count}')
+           logger1.info(f'Polling Frequency out range count -> {out_count}')
+           while True:
+             logger1.info(f'Set a Signal For {key}')
+             set_signaling_values[key]=1
+             hex_binary=Values["AppFlagAsk"]
+             logger1.info(f'App Flag Ack {hex_binary}')
+             binary1_output =bin(int(binascii.hexlify(hex_binary[0:1]), 16))[2:].zfill( 8)[::-1]
+             binary2_output = bin(int(binascii.hexlify(hex_binary[1:2]),16))[2:].zfill( 8)[::-1]
+             if i<8 and binary1_output[i]=='1':
+               reset_count+=1
+               i+=1
+               logger1.info(f'App Flag Ack  for {reset_signaling_values[i]}')
+               break
+             if i>=8 and binary2_output[i-7-1]=='1':
+                reset_count+=1
+                i+=1
+                logger1.info(f'App Flag Ack  for {reset_signaling_values[i]}')
+                break  
+        logger1.info(f'Signal Set count is {set_count}')
+        logger1.info(f'Signal ack from printer count {reset_count}')
         elapsed_time = time.time() - start_time
         if elapsed_time >= duration:
-            break
+            logger1.info('--------------------------End of Duration Testing----------------------------------------------')
+            return 0
 
     def encode_tlv(name, length):  
         tlv = 0
