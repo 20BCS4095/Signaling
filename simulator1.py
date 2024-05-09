@@ -271,23 +271,7 @@ class SignalingData:
            logger1.info(f'Printer Last seen -> {m}')
            logger1.info(f'Polling Frequency within range count -> {range_count}')
            logger1.info(f'Polling Frequency out range count -> {out_count}')
-           while True:
-             logger1.info(f'Set a Signal For {key}')
-             set_signaling_values[key]=1
-             hex_binary=Values["AppFlagAsk"]
-             logger1.info(f'App Flag Ack {hex_binary}')
-             binary1_output =bin(int(binascii.hexlify(hex_binary[0:1]), 16))[2:].zfill( 8)[::-1]
-             binary2_output = bin(int(binascii.hexlify(hex_binary[1:2]),16))[2:].zfill( 8)[::-1]
-             if i<8 and binary1_output[i]=='1':
-               reset_count+=1
-               i+=1
-               logger1.info(f'App Flag Ack  for {reset_signaling_values[i]}')
-               break
-             if i>=8 and binary2_output[i-7-1]=='1':
-                reset_count+=1
-                i+=1
-                logger1.info(f'App Flag Ack  for {reset_signaling_values[i]}')
-                break 
+           set_signaling_values[key]=1
         logger1.info(f'Signal Set count is {set_count}')
         logger1.info(f'Signal ack from printer count {reset_count}')
         elapsed_time = time.time() - start_time
