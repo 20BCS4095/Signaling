@@ -831,7 +831,6 @@ def get_duration():
     status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
     status_thread2.start()   
     logs = []
-    time.sleep(duration_seconds+50)
     with open('logfile1.log', 'r') as f:
         logs = f.readlines()
     return render_template('logs.html', logs=logs)
