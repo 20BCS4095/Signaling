@@ -11,6 +11,7 @@ import random
 import hashlib
 import subprocess
 import binascii
+import random
 app = Flask(__name__)
 
 logger1 = logging.getLogger('logger1')
@@ -66,6 +67,7 @@ collectionId=''
 Descriptor=''
 range_count=0
 out_count=0
+reset_count=0
 signaling_set_by_server=0
 signaling_ack_by_server=0
 configuration_change=""
@@ -255,30 +257,45 @@ class SignalingData:
     def repeat_function(duration):
       global set_signaling_values
       set_count=0
-      reset_count=0
+      global reset_count
       log_file = 'logfile1.log'
       SignalingData.clear_logs(log_file)
       logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
       start_time = time.time()
-      elapsed_time = time.time() - start_time
-      while elapsed_time < duration:
-        i=0
-        for key,values in set_signaling_values.items():
-           set_count+=1
-           logger1.info(f'Printer Status -> {printer_status}')
-           epoch_time=last_request_time
-           normal_time = datetime.datetime.utcfromtimestamp(epoch_time)
-           m=normal_time.strftime('%Y-%m-%d %H:%M:%S')
-           logger1.info(f'Printer Last seen -> {m}')
-           logger1.info(f'Polling Frequency within range count -> {range_count}')
-           logger1.info(f'Polling Frequency out range count -> {out_count}')
-           set_signaling_values[key]=1
-        logger1.info(f'Signal Set count is {set_count}')
-        logger1.info(f'Signal ack from printer count {reset_count}')
-        elapsed_time = time.time() - start_time
-        if elapsed_time >= duration:
-            logger1.info('--------------------------End of Duration Testing----------------------------------------------')
-            return 0
+      end_time =start_time +(duration *60)
+      options=["start_tunnel_1","start_tunnel_2","start_tunnel_3","start_tunnel_4","echo","rtp_kick","fw_update","registration_subscription","cdm_pubsub_1","cdm_pubsub_2","cdm_pubsub_3","connectivity_configuration","device_configuration"]
+      num_keys = random.randint(1, 2)
+      random_keys = random.sample(options, num_keys)
+      selected=[]
+      if num_keys==2:
+         set_count+=2
+         set_signaling_values[random_keys[0]]=1
+         set_signaling_values[random_keys[1]]=1
+         logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
+      else:
+         set_count+=1
+         set_signaling_values[random_keys[0]]=1
+         logger1.info(f'Selected signaling {random_keys[0]}')
+      while time.time()<end_time:
+         if set_signaling_values[random_keys[0]]:
+            time.sleep(10)
+            num_keys = random.randint(1, 2)
+            random_keys = random.sample(options, num_keys)
+            if num_keys==2:
+              set_count+=2
+              set_signaling_values[random_keys[0]]=1
+              set_signaling_values[random_keys[1]]=1
+              logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
+            else:
+               set_count+=1
+               set_signaling_values[random_keys[0]]=1
+               logger1.info(f'Selected signaling {random_keys[0]}')
+            time.sleep(1)
+      if set_signaling_values[random_keys[0]]!=0:
+         time.sleep(50)
+      logger1.info('------------------Duration test completed-----------------------')
+      logger1.info(f'Total no of bit set by server -> {set_count}')
+      logger1.info(f'Total no of bit ack -> {reset_count}')            
 
     def encode_tlv(name, length):  
         tlv = 0
@@ -588,6 +605,7 @@ class SignalingData:
 
     def response_packet():
         global signaling_ack_by_server
+        global reset_count
         index=0
         decimal_values=[]
         encrypted_values=[]
@@ -609,6 +627,7 @@ class SignalingData:
                 if m==0:
                   a=[192,0,127]
                   signaling_ack_by_server=signaling_ack_by_server+1
+                  reset_count+=1
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
@@ -632,6 +651,7 @@ class SignalingData:
                 if m==0:
                   a=[192,0,127]
                   signaling_ack_by_server=signaling_ack_by_server+1
+                  reset_count+=1
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
