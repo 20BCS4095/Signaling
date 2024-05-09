@@ -801,7 +801,7 @@ def update_config_data1():
          'http://10.224.1.83/hp/device/WSFramework/underware/v1/command'
          ]
         try:
-          result = subprocess.run(curl_command1, shell=True, capture_output=True, text=True)
+          result = subprocess.run(curl_command, shell=True, capture_output=True, text=True)
           print("Curl output:", result)
         except subprocess.CalledProcessError as e:
           print("Error executing curl command:", e)
@@ -908,7 +908,6 @@ def post_json():
             else:
                 printer_simulator= "NO Printer doesn't apply simulator time"
             success_frame=SignalingData.response_packet()
-            print(set_signaling_values)
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
