@@ -260,7 +260,7 @@ class SignalingData:
       SignalingData.clear_logs(log_file)
       logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
       start_time = time.time()
-      while True:
+      while elapsed_time < duration:
         i=0
         for key,values in set_signaling_values.items():
            set_count+=1
