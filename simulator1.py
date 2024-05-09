@@ -888,7 +888,7 @@ def post_json():
        difference_in_seconds = difference.total_seconds()
     else:
        difference_in_seconds=0.0
-    if difference_in_seconds>=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])) and difference_in_seconds<=update_config_data["PollingDelay"]:
+    if difference_in_seconds>=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])) and difference_in_seconds<=int(update_config_data["PollingDelay"]):
        range_count+=1
     else:
        out_count+=1
