@@ -170,6 +170,54 @@ def check_printer_status():
             printer_status="Printer is online"
         time.sleep(5)
 
+def clear_logs(log_file):
+    with open(log_file, 'w') as f:
+        f.truncate(0)
+    print("Logs cleared successfully.")
+
+def repeat_function(duration):
+    global set_signaling_values
+    set_count=0
+    global reset_count
+    log_file = 'logfile1.log'
+    SignalingData.clear_logs(log_file)
+    logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
+    start_time = time.time()
+    end_time =start_time +duration
+    options=["start_tunnel_1","start_tunnel_2","start_tunnel_3","start_tunnel_4","echo","rtp_kick","fw_update","registration_subscription","cdm_pubsub_1","cdm_pubsub_2","cdm_pubsub_3","connectivity_configuration","device_configuration"]
+    num_keys = random.randint(1, 2)
+    random_keys = random.sample(options, num_keys)
+    selected=[]
+    if num_keys==2:
+        set_count+=2
+        set_signaling_values[random_keys[0]]=1
+        set_signaling_values[random_keys[1]]=1
+        logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
+    else:
+        set_count+=1
+        set_signaling_values[random_keys[0]]=1
+        logger1.info(f'Selected signaling {random_keys[0]}')
+    while time.time()<end_time:
+        if set_signaling_values[random_keys[0]]:
+            time.sleep(1)
+            num_keys = random.randint(1, 2)
+            random_keys = random.sample(options, num_keys)
+            if num_keys==2:
+              set_count+=2
+              set_signaling_values[random_keys[0]]=1
+              set_signaling_values[random_keys[1]]=1
+              logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
+            else:
+               set_count+=1
+               set_signaling_values[random_keys[0]]=1
+               logger1.info(f'Selected signaling {random_keys[0]}')
+            time.sleep(1)
+    if set_signaling_values[random_keys[0]]!=0:
+        time.sleep(50)
+    logger1.info('------------------Duration test completed-----------------------')
+    logger1.info(f'Total no of bit set by server -> {set_count}')
+    logger1.info(f'Total no of bit ack -> {reset_count}')
+
 class Version():
     major=SUPPORTED_MAJOR_VERSION
     minor=SUPPORTED_MINOR_VERSION
@@ -249,54 +297,7 @@ class SignalingData:
     }
 
     @staticmethod
-    def clear_logs(log_file):
-      with open(log_file, 'w') as f:
-        f.truncate(0)
-      print("Logs cleared successfully.")
-       
-    def repeat_function(duration):
-      global set_signaling_values
-      set_count=0
-      global reset_count
-      log_file = 'logfile1.log'
-      SignalingData.clear_logs(log_file)
-      logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
-      start_time = time.time()
-      end_time =start_time +duration
-      options=["start_tunnel_1","start_tunnel_2","start_tunnel_3","start_tunnel_4","echo","rtp_kick","fw_update","registration_subscription","cdm_pubsub_1","cdm_pubsub_2","cdm_pubsub_3","connectivity_configuration","device_configuration"]
-      num_keys = random.randint(1, 2)
-      random_keys = random.sample(options, num_keys)
-      selected=[]
-      if num_keys==2:
-         set_count+=2
-         set_signaling_values[random_keys[0]]=1
-         set_signaling_values[random_keys[1]]=1
-         logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
-      else:
-         set_count+=1
-         set_signaling_values[random_keys[0]]=1
-         logger1.info(f'Selected signaling {random_keys[0]}')
-      while time.time()<end_time:
-         if set_signaling_values[random_keys[0]]:
-            time.sleep(1)
-            num_keys = random.randint(1, 2)
-            random_keys = random.sample(options, num_keys)
-            if num_keys==2:
-              set_count+=2
-              set_signaling_values[random_keys[0]]=1
-              set_signaling_values[random_keys[1]]=1
-              logger1.info(f'Selected signaling {random_keys[0]} , {random_keys[1]}')
-            else:
-               set_count+=1
-               set_signaling_values[random_keys[0]]=1
-               logger1.info(f'Selected signaling {random_keys[0]}')
-            time.sleep(1)
-      if set_signaling_values[random_keys[0]]!=0:
-         time.sleep(50)
-      logger1.info('------------------Duration test completed-----------------------')
-      logger1.info(f'Total no of bit set by server -> {set_count}')
-      logger1.info(f'Total no of bit ack -> {reset_count}')            
-
+                   
     def encode_tlv(name, length):  
         tlv = 0
         if length <= SignalingData.VariableLengthLimits_[name][1]:
@@ -836,7 +837,7 @@ def update_config_data1():
 def get_duration():
     duration_hours = float(request.form['hours']) 
     duration_seconds = duration_hours * 60  # Convert hours to seconds
-    status_thread2 = threading.Thread(target=SignalingData.repeat_function(duration_seconds))
+    status_thread2 = threading.Thread(target=repeat_function(duration_seconds))
     status_thread2.daemon = True
     status_thread2.start()   
     logs = []
