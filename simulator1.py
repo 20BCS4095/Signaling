@@ -62,6 +62,7 @@ encrypted_data=b''
 stored_binary =b''
 aad=b''
 nonce=b''
+durationTest=True
 plaintext=b''
 collectionId=''
 Descriptor=''
@@ -176,6 +177,7 @@ def clear_logs(log_file):
     print("Logs cleared successfully.")
 
 def repeat_function(duration):
+    global durationTest
     global set_signaling_values
     set_count=0
     global reset_count
@@ -186,14 +188,14 @@ def repeat_function(duration):
     end_time =start_time +duration
     options=["start_tunnel_1","start_tunnel_2","start_tunnel_3","start_tunnel_4","echo","rtp_kick","fw_update","registration_subscription","cdm_pubsub_1","cdm_pubsub_2","cdm_pubsub_3","connectivity_configuration","device_configuration"]
     while time.time() < end_time:
-        print(time.time(),end_time)
-        num_keys = random.randint(1,2)
-        random_keys = random.sample(options, num_keys)
-        print(random_keys)
-        for key in random_keys:
-           set_signaling_values[key] = 1
-           set_count += 1
-           logger1.info(f'Selected signaling {key}')
+        if durationTest:
+           num_keys = random.randint(1,2)
+           random_keys = random.sample(options, num_keys)
+           for key in random_keys:
+              set_signaling_values[key] = 1
+              set_count += 1
+              logger1.info(f'Selected signaling {key}')
+              durationTest=False
     print(time.time())
     time.sleep(50)
     logger1.info('------------------Duration test completed-----------------------')
@@ -611,6 +613,7 @@ class SignalingData:
                   a=[192,0,127]
                   signaling_ack_by_server=signaling_ack_by_server+1
                   reset_count+=1
+                  durationTest=True
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
                   for x in a:
                    encrypted_values.append(x)
@@ -633,6 +636,7 @@ class SignalingData:
                 m=SignalingData.setCollectionContent(key,value)
                 if m==0:
                   a=[192,0,127]
+                  durationTest=True
                   signaling_ack_by_server=signaling_ack_by_server+1
                   reset_count+=1
                   encrypted_values.append(SignalingData.encode_tlv(Variable.CollectionContent,len(a)))
