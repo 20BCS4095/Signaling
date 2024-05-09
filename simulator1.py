@@ -887,7 +887,7 @@ def post_json():
             request_value = [char for char in stored_binary_data]
             request_data = ' '.join(map(str, request_value))
             decoder_value=SignalingData.RequestPacketDecode(stored_binary_data)
-            key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter(update_config_data["SignatureKey"])
+            key,nonce,ciphertext,tag,aad=SignalingData.gcm_parameter("TGF1cmVudCB3cm90")
             encrypted_data= SignalingData.aes_gcm_decrypt(key,nonce,ciphertext,tag,aad)
             encrypted_value=SignalingData.RequestPacketDecode(encrypted_data)
             if Values['TimeStamp']==Values['CurrentReplyTime']:
