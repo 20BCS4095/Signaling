@@ -792,7 +792,7 @@ def update_config_data1():
            "encoding": "text",
            "command": command1
         }
-       print(base_url,command1)
+        print(base_url,command1)
         try:
            json_data=json.dumps(request_body)
            response = requests.post(base_url,data=json_data)
