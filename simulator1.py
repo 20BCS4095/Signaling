@@ -199,7 +199,6 @@ def repeat_function(duration):
         logger1.info(f'Selected signaling {random_keys[0]}')
     while time.time()<end_time:
         if set_signaling_values[random_keys[0]]:
-            time.sleep(1)
             num_keys = random.randint(1, 2)
             random_keys = random.sample(options, num_keys)
             if num_keys==2:
@@ -211,7 +210,6 @@ def repeat_function(duration):
                set_count+=1
                set_signaling_values[random_keys[0]]=1
                logger1.info(f'Selected signaling {random_keys[0]}')
-            time.sleep(1)
     if set_signaling_values[random_keys[0]]!=0:
         time.sleep(50)
     logger1.info('------------------Duration test completed-----------------------')
