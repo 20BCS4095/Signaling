@@ -274,6 +274,8 @@ class SignalingData:
              logger1.info(f'Set a Signal For {key}')
              set_signaling_values[key]=1
              hex_binary=Values["AppFlagAsk"]
+             print(hex_binary)
+             hex_binary=Values["AppFlagAsk"].encode()
              logger1.info(f'App Flag Ack {hex_binary}')
              binary1_output =bin(int(binascii.hexlify(hex_binary[0:1]), 16))[2:].zfill( 8)[::-1]
              binary2_output = bin(int(binascii.hexlify(hex_binary[1:2]),16))[2:].zfill( 8)[::-1]
