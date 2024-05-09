@@ -289,7 +289,6 @@ class SignalingData:
                 i+=1
                 logger1.info(f'App Flag Ack  for {reset_signaling_values[i]}')
                 break 
-             time.sleep(60)
         logger1.info(f'Signal Set count is {set_count}')
         logger1.info(f'Signal ack from printer count {reset_count}')
         elapsed_time = time.time() - start_time
