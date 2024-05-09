@@ -180,7 +180,7 @@ def repeat_function(duration):
     set_count=0
     global reset_count
     log_file = 'logfile1.log'
-    SignalingData.clear_logs(log_file)
+    clear_logs(log_file)
     logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
     start_time = time.time()
     end_time =start_time +duration
