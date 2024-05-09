@@ -783,18 +783,19 @@ def update_config_data1():
             'URL': url
         }
 
-        base_url = f"http://{update_config_data['PrinterID']}/hp/device/WSFramework/underware/v1/command"
+        base_url = "http://"+update_config_data['PrinterID']+"/hp/device/WSFramework/underware/v1/command"
         command1="Signaling PUB_setSignalingConfig "+update_config_data["CollectionID"]+" "+update_config_data["Descriptor"]+" "+update_config_data["SignatureKey"]+" "+update_config_data["ProtocolSwitchingPolicy"]
         request_body = {
            "version": "1.0.0",
            "targetService": "mainApp",
-           "blocking": True,
+           "blocking": "true",
            "encoding": "text",
            "command": command1
         }
+       print(base_url,command1)
         try:
-           data=json.dumps(request_body)
-           response = requests.post(base_url,data=data)
+           json_data=json.dumps(request_body)
+           response = requests.post(base_url,data=json_data)
            print(response)
         except:
            print('Fail')
@@ -802,10 +803,11 @@ def update_config_data1():
         request_body = {
            "version": "1.0.0",
            "targetService": "mainApp",
-           "blocking": True,
+           "blocking": "true",
            "encoding": "text",
            "command": command2
         }
+        print(command2)
         try:
            data1=json.dumps(request_body)
            response = requests.post(base_url, data=data1)
