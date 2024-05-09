@@ -818,7 +818,7 @@ def update_config_data1():
 @app.route('/get_duration', methods=['POST'])
 def get_duration():
     duration_hours = float(request.form['hours']) 
-    duration_seconds = duration_hours * 1  # Convert hours to seconds
+    duration_seconds = duration_hours * 360  # Convert hours to seconds
     SignalingData.repeat_function(duration_seconds)   
     logs = []
     with open('logfile1.log', 'r') as f:
