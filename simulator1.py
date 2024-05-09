@@ -262,7 +262,7 @@ class SignalingData:
       SignalingData.clear_logs(log_file)
       logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
       start_time = time.time()
-      end_time =start_time +(duration *60)
+      end_time =start_time +duration
       options=["start_tunnel_1","start_tunnel_2","start_tunnel_3","start_tunnel_4","echo","rtp_kick","fw_update","registration_subscription","cdm_pubsub_1","cdm_pubsub_2","cdm_pubsub_3","connectivity_configuration","device_configuration"]
       num_keys = random.randint(1, 2)
       random_keys = random.sample(options, num_keys)
