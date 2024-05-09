@@ -835,7 +835,7 @@ def update_config_data1():
 @app.route('/get_duration', methods=['POST'])
 def get_duration():
     duration_hours = float(request.form['hours']) 
-    duration_seconds = duration_hours * 10  # Convert hours to seconds
+    duration_seconds = duration_hours * 120  # Convert hours to seconds
     status_thread = threading.Thread(target=SignalingData.repeat_function(duration_seconds))
     status_thread.daemon = True
     status_thread.start()   
