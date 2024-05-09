@@ -744,7 +744,6 @@ def update_configuration():
 def view_metrics():
     global update_config_data
     status_thread = threading.Thread(target=check_printer_status)
-    status_thread.daemon = True
     status_thread.start()
     epoch_time=last_request_time
     normal_time = datetime.datetime.utcfromtimestamp(epoch_time)
@@ -838,7 +837,6 @@ def get_duration():
     duration_hours = float(request.form['hours']) 
     duration_seconds = duration_hours * 60  # Convert hours to seconds
     status_thread2 = threading.Thread(target=repeat_function(duration_seconds))
-    status_thread2.daemon = True
     status_thread2.start()   
     logs = []
     with open('logfile1.log', 'r') as f:
