@@ -2,3 +2,4 @@ Flask
 Gunicorn
 cryptography
 loguru==0.5.3
+requests==2.26.0
