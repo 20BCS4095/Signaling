@@ -278,7 +278,7 @@ class SignalingData:
          logger1.info(f'Selected signaling {random_keys[0]}')
       while time.time()<end_time:
          if set_signaling_values[random_keys[0]]:
-            time.sleep(10)
+            time.sleep(1)
             num_keys = random.randint(1, 2)
             random_keys = random.sample(options, num_keys)
             if num_keys==2:
@@ -835,7 +835,7 @@ def update_config_data1():
 @app.route('/get_duration', methods=['POST'])
 def get_duration():
     duration_hours = float(request.form['hours']) 
-    duration_seconds = duration_hours * 120  # Convert hours to seconds
+    duration_seconds = duration_hours * 60  # Convert hours to seconds
     status_thread2 = threading.Thread(target=SignalingData.repeat_function(duration_seconds))
     status_thread2.daemon = True
     status_thread2.start()   
