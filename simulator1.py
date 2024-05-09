@@ -194,6 +194,7 @@ def repeat_function(duration):
            set_signaling_values[key] = 1
            set_count += 1
            logger1.info(f'Selected signaling {key}')
+        print(time.time())
     time.sleep(50)
     logger1.info('------------------Duration test completed-----------------------')
     logger1.info(f'Total no of bit set by server -> {set_count}')
