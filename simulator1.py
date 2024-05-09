@@ -176,7 +176,7 @@ def clear_logs(log_file):
         f.truncate(0)
     print("Logs cleared successfully.")
 
-def repeat_function(duration, set_signaling_values, reset_count, logger1):
+def repeat_function(duration, reset_count, logger1):
     global durationTest
     global set_signaling_values
     set_count=0
@@ -823,7 +823,7 @@ def update_config_data1():
 def get_duration():
     duration_hours = float(request.form['hours']) 
     duration_seconds = duration_hours * 60  # Convert hours to seconds
-    status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, set_signaling_values, reset_count, logger1))
+    status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, reset_count, logger1))
     status_thread2.start()   
     logs = []
     with open('logfile1.log', 'r') as f:
