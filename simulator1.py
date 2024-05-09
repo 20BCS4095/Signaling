@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, Response
+from flask import Flask, json, request, render_template, Response
 import datetime
 from enum import IntEnum
 from cryptography.hazmat.backends import default_backend
@@ -792,7 +792,8 @@ def update_config_data1():
            "command": command1
         }
         try:
-           response = requests.post(base_url, json=request_body)
+           data=json.dumps(request_body)
+           response = requests.post(base_url,data=data)
            print(response)
         except:
            print('Fail')
@@ -805,7 +806,8 @@ def update_config_data1():
            "command": command2
         }
         try:
-           response = requests.post(base_url, json=request_body)
+           data1=json.dumps(request_body)
+           response = requests.post(base_url, data=data1)
            print(response)
         except:
            print('Fail')
