@@ -182,8 +182,6 @@ def repeat_function(duration, logger1):
     global set_signaling_values
     set_count=0
     global reset_count
-    log_file = 'logfile1.log'
-    clear_logs(log_file)
     logger1.info('--------------------------------Duration Testing Start-----------------------------------------------')
     start_time = time.time()
     end_time =start_time +duration
@@ -198,7 +196,7 @@ def repeat_function(duration, logger1):
               logger1.info(f'Selected signaling {key}')
               durationTest=False
     print(time.time())
-    time.sleep(50)
+    time.sleep(20)
     logger1.info('------------------Duration test completed-----------------------')
     logger1.info(f'Total no of bit set by server -> {set_count}')
     logger1.info(f'Total no of bit ack -> {reset_count}')
@@ -826,6 +824,8 @@ def update_config_data1():
     
 @app.route('/get_duration', methods=['POST'])
 def get_duration():
+    log_file = 'logfile1.log'
+    clear_logs(log_file)
     duration_hours = float(request.form['hours']) 
     duration_seconds = duration_hours * 60  # Convert hours to seconds
     status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
