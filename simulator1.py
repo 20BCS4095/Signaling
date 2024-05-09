@@ -798,7 +798,7 @@ def update_config_data1():
          'POST',
          '-v',
          '-d', '{"version":"1.0.0","targetService":"mainApp","blocking":true,"encoding":"text","command":"Signaling PUB_setSignalingConfig 5432 600 TGF1cmVudCB3cm90 httpOnly"}',
-         'http://10.224.1.83/hp/device/WSFramework/underware/v1/command'
+         'http://10.224.1.254/hp/device/WSFramework/underware/v1/command'
          ]
         try:
           result = subprocess.run(curl_command, shell=True, capture_output=True, text=True)
@@ -811,7 +811,7 @@ def update_config_data1():
          'POST',
          '-v',
          '-d', '{"version":"1.0.0","targetService":"mainApp","blocking":true,"encoding":"text","command":"Signaling PUB_setHttpSignalingConfig 15 15 6 7 5 13 https://signaling1.onrender.com/post_json"}',
-         'http://10.224.1.83/hp/device/WSFramework/underware/v1/command'
+         'http://10.224.1.254/hp/device/WSFramework/underware/v1/command'
          ]
         try:
           result = subprocess.run(curl_command2, shell=True, capture_output=True, text=True)
