@@ -760,7 +760,7 @@ def update_config_data():
         ip_address = request.form.get('printer_ip')
         url1 = base_url.format(ip_address)
         command1="Signaling PUB_setSignalingConfig "+update_config_data["CollectionID"]+" "+update_config_data["Descriptor"]+" "+update_config_data["SignatureKey"]+" "+update_config_data["ProtocolSwitchingPolicy"]
-        curl_command1 = f'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"{command1}"}}\'{url1}'
+        curl_command1 = 'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"Signaling PUB_setSignalingConfig 8976 90 ABCDEF35gbhn36dg httpOnly"}}\'http://10.224.1.148/hp/device/WSFramework/underware/v1/command'
         print(curl_command1)
         try:
           result = subprocess.run(curl_command1, shell=True, capture_output=True, text=True)
@@ -768,7 +768,7 @@ def update_config_data():
         except subprocess.CalledProcessError as e:
           print("Error executing curl command:", e)
         command2="Signaling PUB_setHttpSignalingConfig "+update_config_data["PollingDelay"]+" "+update_config_data["PollingTimeout"]+" "+update_config_data["RetryGraceCount"]+" "+update_config_data["RandomWindow"]+" "+update_config_data["PrinterStatusRatio"]+" "+update_config_data["MaxGetsBetweenPosts"]+" "+update_config_data["URL"]
-        curl_command2 = f'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"{command2}"}}\'{url1}'
+        curl_command2 = 'curl -X POST -v -d \'{{"version":"1.0.0","targetService":"mainApp","blocking":True,"encoding":"text","command":"Signaling PUB_setHttpSignalingConfig 15 15 12 12 14 12 https://signaling1.onrender.com/post_json"}}\'http://10.224.1.148/hp/device/WSFramework/underware/v1/command'
         try:
           result = subprocess.run(curl_command2, shell=True, capture_output=True, text=True)
           print("Curl output:", result.stdout)
