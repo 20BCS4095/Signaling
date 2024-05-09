@@ -186,7 +186,7 @@ def repeat_function(duration):
     end_time =start_time +duration
     options=["start_tunnel_1","start_tunnel_2","start_tunnel_3","start_tunnel_4","echo","rtp_kick","fw_update","registration_subscription","cdm_pubsub_1","cdm_pubsub_2","cdm_pubsub_3","connectivity_configuration","device_configuration"]
     while time.time() < end_time:
-        print(time.time,end_time)
+        print(time.time(),end_time)
         num_keys = random.randint(1,2)
         random_keys = random.sample(options, num_keys)
         print(random_keys)
