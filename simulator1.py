@@ -758,7 +758,7 @@ def packet_decoder():
    return render_template('PacketDecoder.html')
 
 @app.route('/update_config_data', methods = ['POST'])
-def update_config_data():
+def update_config_data1():
     global update_config_data
     if request.method == 'POST':
         global old_config_data
