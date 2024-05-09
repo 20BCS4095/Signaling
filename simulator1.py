@@ -64,6 +64,7 @@ stored_binary =b''
 aad=b''
 nonce=b''
 durationTest=True
+completeDuration=False
 plaintext=b''
 collectionId=''
 Descriptor=''
@@ -178,7 +179,7 @@ def clear_logs(log_file):
     print("Logs cleared successfully.")
 
 def repeat_function(duration, logger1):
-    global durationTest
+    global durationTest,completeDuration
     global set_signaling_values
     set_count=0
     global reset_count
@@ -200,6 +201,7 @@ def repeat_function(duration, logger1):
     logger1.info('------------------Duration test completed-----------------------')
     logger1.info(f'Total no of bit set by server -> {set_count}')
     logger1.info(f'Total no of bit ack -> {reset_count}')
+    completeDuration=True
 
 class Version():
     major=SUPPORTED_MAJOR_VERSION
@@ -831,9 +833,10 @@ def get_duration():
     status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
     status_thread2.start()   
     logs = []
-    with open('logfile1.log', 'r') as f:
-        logs = f.readlines()
-    return render_template('logs.html', logs=logs)
+    if completeDuration:
+       with open('logfile1.log', 'r') as f:
+          logs = f.readlines()
+       return render_template('logs.html', logs=logs)
 
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
