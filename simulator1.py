@@ -253,6 +253,7 @@ class SignalingData:
       print("Logs cleared successfully.")
        
     def repeat_function(duration):
+      global set_signaling_values
       set_count=0
       reset_count=0
       log_file = 'logfile1.log'
@@ -273,7 +274,6 @@ class SignalingData:
            while True:
              logger1.info(f'Set a Signal For {key}')
              set_signaling_values[key]=1
-             print(set_signaling_values[key])
              hex_binary=Values["AppFlagAsk"]
              logger1.info(f'App Flag Ack {hex_binary}')
              binary1_output =bin(int(binascii.hexlify(hex_binary[0:1]), 16))[2:].zfill( 8)[::-1]
@@ -287,7 +287,8 @@ class SignalingData:
                 reset_count+=1
                 i+=1
                 logger1.info(f'App Flag Ack  for {reset_signaling_values[i]}')
-                break  
+                break 
+             time.sleep(60)
         logger1.info(f'Signal Set count is {set_count}')
         logger1.info(f'Signal ack from printer count {reset_count}')
         elapsed_time = time.time() - start_time
@@ -896,9 +897,11 @@ def post_json():
             else:
                 printer_simulator= "NO Printer doesn't apply simulator time"
             success_frame=SignalingData.response_packet()
+            print(set_signaling_values)
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
+                   
             return success_frame,200
         else:
             return 'No data is received', 400
