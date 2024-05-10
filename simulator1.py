@@ -65,6 +65,7 @@ aad=b''
 nonce=b''
 durationTest=True
 completeDuration=False
+duration_hours=0
 plaintext=b''
 collectionId=''
 Descriptor=''
@@ -826,6 +827,7 @@ def update_config_data1():
     
 @app.route('/get_duration', methods=['POST','GET'])
 def get_duration():
+    global duration_hours
     if request.method == 'POST':
        log_file = 'logfile1.log'
        clear_logs(log_file)
@@ -834,7 +836,7 @@ def get_duration():
        status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
        status_thread2.start()   
        logs=""
-       return render_template('logs.html', logs=logs,duration=duration_hours)
+       return render_template('logs.html', logs=logs)
     if request.method == 'GET':
        if completeDuration:
           logs = []
@@ -842,7 +844,7 @@ def get_duration():
              logs = f.readlines()
        else:
           logs=""
-    return render_template('logs.html', logs=logs)
+       return render_template('logs.html', logs=logs,duration=duration_hours)
        
 
 @app.route('/set_signaling_data', methods=['POST'])
