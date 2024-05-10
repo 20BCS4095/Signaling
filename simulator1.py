@@ -892,10 +892,11 @@ def post_json():
     difference_in_seconds = y_datetime- x_datetime
     print(difference_in_seconds)
     print(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"]))
-    if difference_in_seconds>=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])) and difference_in_seconds<=int(update_config_data["PollingDelay"]):
-       range_count+=1
-    else:
-       out_count+=1
+    if last_response_time:
+       if difference_in_seconds>=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])) and difference_in_seconds<=int(update_config_data["PollingDelay"]):
+          range_count+=1
+       else:
+          out_count+=1
     global stored_binary_data 
     global success_frame
     if request.method == 'POST':
@@ -923,6 +924,7 @@ def post_json():
     elif request.method == 'GET':
         EtagLast=EtagPresent
         EtagPresent = generate_etag(success_frame)
+        last_response_time=0
         if EtagLast == EtagPresent:
             return Response(status=304)
         else:
