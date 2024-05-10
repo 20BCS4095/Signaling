@@ -6,11 +6,43 @@
     <title>Logs</title>
 </head>
 <body>
+    {% if logs %}
     <h1>Logs</h1>
     <ul>
         {% for log in logs %}
         <li>{{ log }}</li>
         {% endfor %}
     </ul>
+    {% else %}
+    <form id="durationForm" >
+        <div id="hours" >Total time {duration} </div>
+        <button type="submit" id="submitButton">Submit</button>
+        <div id="waitMessage" style="display: none;">Please wait...</div>
+    </form>
+    {% endif %}
+    <script>
+        document.getElementById("durationForm").addEventListener("submit", function(event) {
+            document.getElementById("submitButton").setAttribute("disabled", "disabled");
+            document.getElementById("waitMessage").style.display = "block";
+            startCountdown();
+        });
+
+        function startCountdown() {
+            var duration = parseFloat(document.getElementById("hours").value) * 3600; // Duration in seconds
+            var interval = setInterval(function() {
+                duration--;
+                if (duration < 0) {
+                    clearInterval(interval);
+                    document.getElementById("waitMessage").textContent = "Execution completed!";
+                    document.getElementById("submitButton").removeAttribute("disabled");
+                } else {
+                    var hours = Math.floor(duration / 3600);
+                    var minutes = Math.floor((duration % 3600) / 60);
+                    var seconds = duration % 60;
+                    document.getElementById("waitMessage").textContent = "Please wait... Remaining time: " + hours + "h " + minutes + "m " + seconds + "s";
+                }
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
