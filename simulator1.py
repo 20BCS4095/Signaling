@@ -197,7 +197,6 @@ def repeat_function(duration, logger1):
               set_count += 1
               logger1.info(f'Selected signaling {key}')
               durationTest=False
-    print(time.time())
     time.sleep(20)
     logger1.info('------------------Duration test completed-----------------------')
     logger1.info(f'Total no of bit set by server -> {set_count}')
@@ -894,6 +893,8 @@ def post_json():
        difference_in_seconds = difference.total_seconds()
     else:
        difference_in_seconds=0.0
+    print(difference_in_seconds)
+    print(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"]))
     if difference_in_seconds>=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])) and difference_in_seconds<=int(update_config_data["PollingDelay"]):
        range_count+=1
     else:
