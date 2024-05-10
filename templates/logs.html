@@ -16,16 +16,17 @@
     {% else %}
     <div id="hours" >{{duration}}</div>
     <form id="durationForm" >
-        <button  onclick="startCountdown()">Please Wait</button>
+        <div id="hours" >{{duration}}</div>
+        <button type="submit" id="submitButton" onclick="startCountdown()">Please Wait</button>
+        <div id="waitMessage"></div>
     </form>
-    <div id="waitMessage"></div>
     {% endif %}
     <script>
-        // document.getElementById("durationForm").addEventListener("submit", function(event) {
-        //     document.getElementById("submitButton").setAttribute("disabled", "disabled");
-        //     document.getElementById("waitMessage").style.display = "block";
-        //     startCountdown();
-        // });
+        document.getElementById("durationForm").addEventListener("submit", function(event) {
+            document.getElementById("submitButton").setAttribute("disabled", "disabled");
+            document.getElementById("waitMessage").style.display = "block";
+            startCountdown();
+        });
 
         function startCountdown() {
             var duration = parseFloat(document.getElementById("hours").value) * 3600; // Duration in seconds
