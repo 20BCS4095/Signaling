@@ -15,7 +15,7 @@
     </ul>
     {% else %}
     <div id="hours" >{{duration}}</div>
-    <form id="durationForm" >
+    <form id="durationForm" action="/get_duration" method="GET">
         <button type="submit" id="submitButton">Submit</button>
         <div id="waitMessage" style="display: none;">Please Wait</div>
     </form>
