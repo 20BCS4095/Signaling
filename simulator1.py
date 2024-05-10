@@ -833,14 +833,17 @@ def get_duration():
        duration_seconds = duration_hours * 60  # Convert hours to seconds
        status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
        status_thread2.start()   
-       logs = []
-    if completeDuration:
-       with open('logfile1.log', 'r') as f:
-          logs = f.readlines()
-       return render_template('logs.html', logs=logs)
-    else:
        logs=""
        return render_template('logs.html', logs=logs,duration=duration_hours)
+    if request.method == 'GET':
+       if completeDuration:
+          logs = []
+          with open('logfile1.log', 'r') as f:
+             logs = f.readlines()
+       else:
+          logs=""
+    return render_template('logs.html', logs=logs)
+       
 
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
