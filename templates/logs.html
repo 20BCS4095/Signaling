@@ -28,6 +28,10 @@
         });
 
         function startCountdown() {
+            console.log("1")
+            console.log(document.getElementById("hours").value)
+            console.log("2")
+            console.log(document.getElementById("hours"))
             var duration = parseFloat(document.getElementById("hours").value) * 3600; // Duration in seconds
             console.log(duration)
             var interval = setInterval(function() {
