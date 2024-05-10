@@ -25,6 +25,7 @@ logger1.addHandler(file_handler1)
 EtagLast=''
 EtagPresent='0'
 last_request_time = 0
+last_response_time=0
 printer_status="Not started to polling"
 set_signal_data = []
 reset_signal_data = []
@@ -883,12 +884,12 @@ def generate_etag(data):
 
 @app.route('/post_json', methods = ['POST','GET'])
 def post_json():
-    global last_request_time,EtagLast,EtagPresent
+    global last_request_time,EtagLast,EtagPresent,last_response_time
     global printer_simulator,range_count,out_count
     last_request_time = time.time()
     if Values['TimeStamp']!='' and Values['CurrentReplyTime']!='':
-       x_datetime = datetime.datetime.strptime(Values['TimeStamp'], "%Y-%m-%d %H:%M:%S")
-       y_datetime = datetime.datetime.strptime(Values['CurrentReplyTime'], "%Y-%m-%d %H:%M:%S")
+       x_datetime =last_request_time
+       y_datetime =last_response_time
        difference = y_datetime- x_datetime
        difference_in_seconds = difference.total_seconds()
     else:
@@ -915,6 +916,7 @@ def post_json():
             else:
                 printer_simulator= "NO Printer doesn't apply simulator time"
             success_frame=SignalingData.response_packet()
+            last_response_time=time.time()
             for appSate, appAsk in zip(list(AppFlagAsk),list(set_signaling_values)):
                 if set_signaling_values[appAsk] and AppFlagAsk[appSate]:
                     set_signaling_values[appAsk]=0
