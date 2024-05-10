@@ -824,18 +824,23 @@ def update_config_data1():
         """
         return popup_script
     
-@app.route('/get_duration', methods=['POST'])
+@app.route('/get_duration', methods=['POST','GET'])
 def get_duration():
-    log_file = 'logfile1.log'
-    clear_logs(log_file)
-    duration_hours = float(request.form['hours']) 
-    duration_seconds = duration_hours * 60  # Convert hours to seconds
-    status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
-    status_thread2.start()   
-    logs = []
-    with open('logfile1.log', 'r') as f:
-       logs = f.readlines()
-    return render_template('logs.html', logs=logs)
+    if request.method == 'POST':
+       log_file = 'logfile1.log'
+       clear_logs(log_file)
+       duration_hours = float(request.form['hours'])
+       duration_seconds = duration_hours * 60  # Convert hours to seconds
+       status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
+       status_thread2.start()   
+       logs = []
+    if completeDuration:
+       with open('logfile1.log', 'r') as f:
+          logs = f.readlines()
+       return render_template('logs.html', logs=logs)
+    else:
+       logs=""
+       return render_template('logs.html', logs=logs,duration=duration_hours)
 
 @app.route('/set_signaling_data', methods=['POST'])
 def set_signaling_data():
