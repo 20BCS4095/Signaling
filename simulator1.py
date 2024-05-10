@@ -204,6 +204,33 @@ def repeat_function(duration, logger1):
     logger1.info(f'Total no of bit ack -> {reset_count}')
     completeDuration=True
 
+def update_configuration_data(update_config):
+   base_url = "http://"+update_config['PrinterID']+"/hp/device/WSFramework/underware/v1/command"
+   command1="Signaling PUB_setSignalingConfig "+update_config["CollectionID"]+" "+update_config["Descriptor"]+" "+update_config["SignatureKey"]+" "+update_config["ProtocolSwitchingPolicy"]
+   request_body = {
+    "version": "1.0.0",
+    "targetService": "mainApp",
+    "blocking": "true",
+    "encoding": "text",
+    "command": command1
+    }
+   print(base_url,command1)
+   json_data=json.dumps(request_body)
+   response = requests.post(base_url,data=json_data)
+   print(response)
+   command2="Signaling PUB_setHttpSignalingConfig "+update_config["PollingDelay"]+" "+update_config["PollingTimeout"]+" "+update_config["RetryGraceCount"]+" "+update_config["RandomWindow"]+" "+update_config["PrinterStatusRatio"]+" "+update_config["MaxGetsBetweenPosts"]+" "+update_config["URL"]
+   request_body = {
+           "version": "1.0.0",
+           "targetService": "mainApp",
+           "blocking": "true",
+           "encoding": "text",
+           "command": command2
+        }
+   print(command2)
+   data1=json.dumps(request_body)
+   response = requests.post(base_url, data=data1)
+   print(response)
+   
 class Version():
     major=SUPPORTED_MAJOR_VERSION
     minor=SUPPORTED_MINOR_VERSION
@@ -783,38 +810,8 @@ def update_config_data1():
             'MaxGetsBetweenPosts': max_gets_between_posts,
             'URL': url
         }
-
-        base_url = "http://"+update_config_data['PrinterID']+"/hp/device/WSFramework/underware/v1/command"
-        command1="Signaling PUB_setSignalingConfig "+update_config_data["CollectionID"]+" "+update_config_data["Descriptor"]+" "+update_config_data["SignatureKey"]+" "+update_config_data["ProtocolSwitchingPolicy"]
-        request_body = {
-           "version": "1.0.0",
-           "targetService": "mainApp",
-           "blocking": "true",
-           "encoding": "text",
-           "command": command1
-        }
-        print(base_url,command1)
-        try:
-           json_data=json.dumps(request_body)
-           response = requests.post(base_url,data=json_data)
-           print(response)
-        except:
-           print('Fail')
-        command2="Signaling PUB_setHttpSignalingConfig "+update_config_data["PollingDelay"]+" "+update_config_data["PollingTimeout"]+" "+update_config_data["RetryGraceCount"]+" "+update_config_data["RandomWindow"]+" "+update_config_data["PrinterStatusRatio"]+" "+update_config_data["MaxGetsBetweenPosts"]+" "+update_config_data["URL"]
-        request_body = {
-           "version": "1.0.0",
-           "targetService": "mainApp",
-           "blocking": "true",
-           "encoding": "text",
-           "command": command2
-        }
-        print(command2)
-        try:
-           data1=json.dumps(request_body)
-           response = requests.post(base_url, data=data1)
-           print(response)
-        except:
-           print('Fail')
+        thread3=threading.Thread(target=update_configuration_data, args=(update_config_data,))
+        thread3.start()
         
         
         popup_script = """
