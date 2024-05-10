@@ -205,8 +205,8 @@ def repeat_function(duration, logger1):
     completeDuration=True
 
 def update_configuration_data(update_config):
-   base_url = "http://"+update_config['PrinterID']+"/hp/device/WSFramework/underware/v1/command"
-   command1="Signaling PUB_setSignalingConfig "+update_config["CollectionID"]+" "+update_config["Descriptor"]+" "+update_config["SignatureKey"]+" "+update_config["ProtocolSwitchingPolicy"]
+   base_url = "http://"+str(update_config['PrinterID'])+"/hp/device/WSFramework/underware/v1/command"
+   command1="Signaling PUB_setSignalingConfig "+str(update_config["CollectionID"])+" "+str(update_config["Descriptor"])+" "+str(update_config["SignatureKey"])+" "+str(update_config["ProtocolSwitchingPolicy"])
    request_body = {
     "version": "1.0.0",
     "targetService": "mainApp",
@@ -214,11 +214,11 @@ def update_configuration_data(update_config):
     "encoding": "text",
     "command": command1
     }
-   print(base_url,command1)
+   print(base_url,command1,request_body)
    json_data=json.dumps(request_body)
    response = requests.post(base_url,data=json_data)
    print(response)
-   command2="Signaling PUB_setHttpSignalingConfig "+update_config["PollingDelay"]+" "+update_config["PollingTimeout"]+" "+update_config["RetryGraceCount"]+" "+update_config["RandomWindow"]+" "+update_config["PrinterStatusRatio"]+" "+update_config["MaxGetsBetweenPosts"]+" "+update_config["URL"]
+   command2="Signaling PUB_setHttpSignalingConfig "+str(update_config["PollingDelay"])+" "+str(update_config["PollingTimeout"])+" "+str(update_config["RetryGraceCount"])+" "+str(update_config["RandomWindow"])+" "+str(update_config["PrinterStatusRatio"])+" "+str(update_config["MaxGetsBetweenPosts"])+" "+str(update_config["URL"])
    request_body = {
            "version": "1.0.0",
            "targetService": "mainApp",
@@ -226,7 +226,7 @@ def update_configuration_data(update_config):
            "encoding": "text",
            "command": command2
         }
-   print(command2)
+   print(command2,request_body)
    data1=json.dumps(request_body)
    response = requests.post(base_url, data=data1)
    print(response)
