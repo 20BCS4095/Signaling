@@ -14,18 +14,18 @@
         {% endfor %}
     </ul>
     {% else %}
+    <div id="hours" >{{duration}}</div>
     <form id="durationForm" >
-        <div id="hours" >{{duration}}</div>
-        <button type="submit" id="submitButton">Submit</button>
-        <div id="waitMessage" style="display: none;">Please wait...</div>
+        <button  onclick="startCountdown()">Please Wait</button>
     </form>
+    <div id="waitMessage"></div>
     {% endif %}
     <script>
-        document.getElementById("durationForm").addEventListener("submit", function(event) {
-            document.getElementById("submitButton").setAttribute("disabled", "disabled");
-            document.getElementById("waitMessage").style.display = "block";
-            startCountdown();
-        });
+        // document.getElementById("durationForm").addEventListener("submit", function(event) {
+        //     document.getElementById("submitButton").setAttribute("disabled", "disabled");
+        //     document.getElementById("waitMessage").style.display = "block";
+        //     startCountdown();
+        // });
 
         function startCountdown() {
             var duration = parseFloat(document.getElementById("hours").value) * 3600; // Duration in seconds
