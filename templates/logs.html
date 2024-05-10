@@ -29,6 +29,7 @@
 
         function startCountdown() {
             var duration = parseFloat(document.getElementById("hours").value) * 3600; // Duration in seconds
+            console.log(duration)
             var interval = setInterval(function() {
                 duration--;
                 if (duration < 0) {
