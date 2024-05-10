@@ -16,11 +16,10 @@
     {% else %}
     <div id="hours" >{{duration}}</div>
     <form id="durationForm" action="/get_duration" method="GET">
-        <button type="submit" id="submitButton">Submit</button>
-        <div id="waitMessage" style="display: none;">Please Wait</div>
+        <button type="submit" id="submitButton">Please Wait</button>
     </form>
     {% endif %}
-    <script>
+<!--     <script>
         document.getElementById("durationForm").addEventListener("submit", function(event) {
             document.getElementById("submitButton").setAttribute("disabled", "disabled");
             document.getElementById("waitMessage").style.display = "block";
@@ -45,6 +44,6 @@
                 }
             }, 1000);
         }
-    </script>
+    </script> -->
 </body>
 </html>
