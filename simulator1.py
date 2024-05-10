@@ -933,10 +933,11 @@ def post_json():
             return success_frame, 200
 @app.route('/view', methods=['GET'])
 def get_json():
-    if completeDuration:
-        with open('logfile1.log', 'r') as f:
-          logs = f.readlines()
-        return render_template('logs.html', logs=logs)
+    global stored_binary_data
+    if stored_binary_data:
+        request_value = [char for char in stored_binary_data]
+        request_data = ' '.join(map(str, request_value))
+        return render_template('index.html', data=request_data, binary_data=stored_binary_data, data1=Values, set_signaling_values=set_signaling_values)
     else:
         return 'No binary data stored', 404
 
