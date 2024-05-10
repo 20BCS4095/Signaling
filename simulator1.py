@@ -887,8 +887,8 @@ def post_json():
     global last_request_time,EtagLast,EtagPresent,last_response_time
     global printer_simulator,range_count,out_count
     last_request_time = time.time()
-    x_datetime =int(last_request_time)
-    y_datetime =int(last_response_time)
+    x_datetime =int(last_response_time)
+    y_datetime =int(last_request_time)
     difference_in_seconds = y_datetime- x_datetime
     print(difference_in_seconds)
     print(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"]))
