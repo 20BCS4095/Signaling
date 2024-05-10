@@ -17,7 +17,7 @@
     <div id="hours" >{{duration}}</div>
     <form id="durationForm" >
         <button type="submit" id="submitButton" onclick="startCountdown()">Submit</button>
-        <div id="waitMessage">Please Wait</div>
+        <div id="waitMessage" style="display: none;">Please Wait</div>
     </form>
     {% endif %}
     <script>
@@ -40,6 +40,7 @@
                     var minutes = Math.floor((duration % 3600) / 60);
                     var seconds = duration % 60;
                     document.getElementById("waitMessage").textContent = "Please wait... Remaining time: " + hours + "h " + minutes + "m " + seconds + "s";
+                    console.log(document.getElementById("waitMessage").textContent)
                 }
             }, 1000);
         }
