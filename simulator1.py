@@ -887,13 +887,9 @@ def post_json():
     global last_request_time,EtagLast,EtagPresent,last_response_time
     global printer_simulator,range_count,out_count
     last_request_time = time.time()
-    if Values['TimeStamp']!='' and Values['CurrentReplyTime']!='':
-       x_datetime =last_request_time
-       y_datetime =last_response_time
-       difference = y_datetime- x_datetime
-       difference_in_seconds = difference.total_seconds()
-    else:
-       difference_in_seconds=0.0
+    x_datetime =last_request_time
+    y_datetime =last_response_time
+    difference_in_seconds = y_datetime- x_datetime
     print(difference_in_seconds)
     print(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"]))
     if difference_in_seconds>=(int(update_config_data["PollingDelay"])-int(update_config_data["RandomWindow"])) and difference_in_seconds<=int(update_config_data["PollingDelay"]):
