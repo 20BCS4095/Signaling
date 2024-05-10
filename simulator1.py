@@ -836,7 +836,7 @@ def get_duration():
        status_thread2 = threading.Thread(target=repeat_function, args=(duration_seconds, logger1))
        status_thread2.start()   
        logs=""
-       return render_template('logs.html', logs=logs)
+       return render_template('logs.html', logs=logs,duration=duration_hours)
     if request.method == 'GET':
        if completeDuration:
           logs = []
