@@ -164,6 +164,8 @@
                     <div class="card">
                         <div class="card-body">
                             {% if polling_frequency %}
+                            <li>Polling Delay -> {{polling_frequency }}</li>
+                            <li>Random Window -> {{polling_frequency-polling_delay}}</li>
                             <li>Polling frequency Range -> {{polling_delay}} - {{ polling_frequency }}</li>
                             <li>Between range count -> {{count}}</li>
                             <li>Out Of range count -> {{out}}</li>
